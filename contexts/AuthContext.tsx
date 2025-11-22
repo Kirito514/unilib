@@ -3,12 +3,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { UserRole, hasPermission, Permission, isAdmin } from '@/lib/permissions';
 
 interface User {
     id: string;
     name: string;
     email: string;
     university?: string;
+    role: UserRole;
 }
 
 interface AuthContextType {
@@ -17,6 +19,9 @@ interface AuthContextType {
     register: (name: string, email: string, password: string, university?: string) => Promise<boolean>;
     logout: () => void;
     isLoading: boolean;
+    hasPermission: (permission: Permission) => boolean;
+    isAdmin: () => boolean;
+    isSuperAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Get user profile from profiles table
         const { data: profile } = await supabase
             .from('profiles')
-            .select('name, university')
+            .select('name, university, role')
             .eq('id', supabaseUser.id)
             .single();
 
@@ -86,7 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: supabaseUser.id,
             email: supabaseUser.email!,
             name: profile?.name || supabaseUser.email!.split('@')[0],
-            university: profile?.university
+            university: profile?.university,
+            role: (profile?.role as UserRole) || 'USER'
         });
     };
 
@@ -140,7 +146,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     id: data.user.id,
                     email: data.user.email!,
                     name: name,
-                    university: university
+                    university: university,
+                    role: 'USER'
                 });
                 return true;
             }
@@ -157,8 +164,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     };
 
+    const checkPermission = (permission: Permission): boolean => {
+        if (!user) return false;
+        return hasPermission(user.role, permission);
+    };
+
+    const checkIsAdmin = (): boolean => {
+        if (!user) return false;
+        return isAdmin(user.role);
+    };
+
+    const checkIsSuperAdmin = (): boolean => {
+        if (!user) return false;
+        return user.role === 'SUPER_ADMIN';
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+        <AuthContext.Provider value={{
+            user,
+            login,
+            register,
+            logout,
+            isLoading,
+            hasPermission: checkPermission,
+            isAdmin: checkIsAdmin,
+            isSuperAdmin: checkIsSuperAdmin
+        }}>
             {children}
         </AuthContext.Provider>
     );

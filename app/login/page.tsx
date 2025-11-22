@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { BookOpen, Mail, Lock, ArrowRight, Sparkles, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -12,6 +12,7 @@ export default function LoginPage() {
     const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuth();
     const router = useRouter();
 
@@ -25,7 +26,7 @@ export default function LoginPage() {
             if (success) {
                 router.push('/dashboard');
             } else {
-                setError('Email yoki parol noto\'g\'ri');
+                setError('Foydalanuvchi topilmadi yoki parol noto\'g\'ri. Ro\'yxatdan o\'tmaganmisiz?');
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
@@ -44,13 +45,6 @@ export default function LoginPage() {
             <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 blur-[100px] rounded-full pointer-events-none animate-pulse-slow" />
 
             <div className="w-full max-w-md relative z-10">
-                {/* Logo */}
-                <Link href="/" className="flex items-center justify-center gap-2 mb-8 group">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                        <BookOpen className="w-7 h-7" />
-                    </div>
-                    <span className="text-3xl font-bold text-foreground group-hover:text-primary transition-colors">UniLib</span>
-                </Link>
 
                 {/* Card */}
                 <div className="bg-card border border-border rounded-2xl shadow-xl p-8">
@@ -96,13 +90,20 @@ export default function LoginPage() {
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                                 <input
                                     id="password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground"
+                                    className="w-full pl-11 pr-11 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground"
                                     placeholder="••••••••"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
                             </div>
                         </div>
 

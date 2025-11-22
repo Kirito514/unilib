@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { AISearchBar } from '@/components/search/AISearchBar';
-import { Users, Trophy, LayoutDashboard, Quote, BookOpen, ArrowRight, Sparkles, Search, MessageCircle, TrendingUp, Star, Code, Calculator, Atom, Globe, Brain, PenTool, History, Dna, Building, Palette, Briefcase, GraduationCap, Library, Lightbulb, Bookmark } from 'lucide-react';
+import { Users, Trophy, LayoutDashboard, Quote, BookOpen, ArrowRight, Sparkles, Search, MessageCircle, TrendingUp, Star, Code, Calculator, Atom, Globe, Brain, PenTool, History, Dna, Building, Palette, Briefcase, GraduationCap, Library, Lightbulb, Bookmark, Mail } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -98,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid - Compact */}
-      <section className="py-20 md:py-24 bg-background">
+      <section id="features" className="py-20 md:py-24 bg-background scroll-mt-16">
         <div className="container px-4 md:px-6 max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Muvaffaqiyat Kalitlari</h2>
@@ -379,6 +379,74 @@ export default function Home() {
                 <p className="text-muted-foreground pl-8 leading-relaxed text-sm">{faq.a}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* About Section */}
+      <section id="about" className="py-20 md:py-24 bg-muted/30 scroll-mt-16">
+        <div className="container px-4 md:px-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">UniLib Haqida</h2>
+              <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
+                UniLib - bu zamonaviy talabalar uchun yaratilgan raqamli kutubxona platformasi. Biz o'qish jarayonini yanada samarali va qiziqarli qilish uchun eng so'nggi texnologiyalardan foydalanamiz.
+              </p>
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                Platformamiz AI-powered qidiruv, real-time guruh muhokamalar, gamifikatsiya elementlari va ko'plab boshqa xususiyatlarni o'z ichiga oladi.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg bg-card border border-border">
+                  <div className="text-2xl font-bold text-primary mb-1">10k+</div>
+                  <div className="text-sm text-muted-foreground">Kitoblar</div>
+                </div>
+                <div className="p-4 rounded-lg bg-card border border-border">
+                  <div className="text-2xl font-bold text-primary mb-1">5k+</div>
+                  <div className="text-sm text-muted-foreground">Foydalanuvchilar</div>
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border border-border">
+                <BookOpen className="w-32 h-32 text-primary" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 md:py-24 bg-background scroll-mt-16">
+        <div className="container px-4 md:px-6 max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Biz Bilan Bog'laning</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Savollaringiz bormi? Biz sizga yordam berishga tayyormiz!
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-xl bg-card border border-border text-center hover:shadow-lg transition-all">
+              <div className="w-12 h-12 mx-auto rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-bold mb-2">Email</h3>
+              <p className="text-sm text-muted-foreground">info@unilib.uz</p>
+            </div>
+            <div className="p-6 rounded-lg bg-card border border-border text-center hover:shadow-lg transition-all">
+              <div className="w-12 h-12 mx-auto rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-bold mb-2">Telegram</h3>
+              <p className="text-sm text-muted-foreground">@unilib_support</p>
+            </div>
+            <div className="p-6 rounded-xl bg-card border border-border text-center hover:shadow-lg transition-all">
+              <div className="w-12 h-12 mx-auto rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Globe className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-bold mb-2">Manzil</h3>
+              <p className="text-sm text-muted-foreground">Toshkent, O'zbekiston</p>
+            </div>
           </div>
         </div>
       </section>

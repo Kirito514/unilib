@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, User, BookOpen, Users, LayoutDashboard, Award, Menu, X, Sun, Moon, LogOut, Quote } from 'lucide-react';
+import { Search, User, BookOpen, Users, LayoutDashboard, Award, Menu, X, Sun, Moon, LogOut, Quote, Sparkles, Info, Mail } from 'lucide-react';
 
 export function Header() {
     const pathname = usePathname();
@@ -35,43 +35,54 @@ export function Header() {
         router.push('/');
     };
 
-    const navItems = [
+    // Landing page'da boshqa tugmalar
+    const isLandingPage = pathname === '/';
+
+    const navItems = isLandingPage ? [
+        { href: '/library', label: 'Kutubxona', icon: BookOpen },
+        { href: '#features', label: 'Xususiyatlar', icon: Sparkles },
+        { href: '#about', label: 'Biz haqimizda', icon: Info },
+        { href: '#contact', label: 'Aloqa', icon: Mail },
+    ] : [
         { href: '/library', label: 'Kutubxona', icon: BookOpen },
         { href: '/groups', label: 'Guruhlar', icon: Users },
         { href: '/leaderboard', label: 'Reyting', icon: Award },
         { href: '/citations', label: 'Iqtiboslar', icon: Quote },
-        { href: '/profile', label: 'Profil', icon: User },
     ];
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <BookOpen className="w-5 h-5 text-primary" />
-                    </div>
-                    <span className="hidden sm:inline">UniLib</span>
-                </Link>
+            <div className={`container flex h-16 items-center px-4 md:px-6 ${(isLandingPage || pathname === '/login' || pathname === '/register') ? 'justify-between' : 'justify-end'}`}>
+                {/* Logo - Only on landing page and auth pages */}
+                {(isLandingPage || pathname === '/login' || pathname === '/register') && (
+                    <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <BookOpen className="w-5 h-5 text-primary" />
+                        </div>
+                        <span className="hidden sm:inline">UniLib</span>
+                    </Link>
+                )}
 
-                {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center gap-1">
-                    {navItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        const Icon = item.icon;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                                    }`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                {item.label}
-                            </Link>
-                        );
-                    })}
-                </nav>
+                {/* Desktop Nav - Only on landing page */}
+                {isLandingPage && (
+                    <nav className="hidden md:flex items-center gap-1">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href;
+                            const Icon = item.icon;
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                                        }`}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                )}
 
                 {/* Right Actions */}
                 <div className="flex items-center gap-2">
@@ -84,7 +95,7 @@ export function Header() {
                                 placeholder="Qidirish..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-[200px] rounded-xl bg-muted/50 border border-transparent pl-10 pr-4 py-2 text-sm focus:bg-background focus:border-primary/20 transition-all outline-none"
+                                className="w-[280px] xl:w-[350px] rounded-xl bg-muted/50 border border-transparent pl-10 pr-4 py-2 text-sm focus:bg-background focus:border-primary/20 transition-all outline-none"
                             />
                         </div>
                     </form>
@@ -109,11 +120,11 @@ export function Header() {
                                         <div className="px-3 py-2 border-b border-border mb-2">
                                             <p className="font-semibold text-sm">{user.name}</p>
                                         </div>
-                                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted rounded-lg">
+                                        <Link href="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted rounded-lg">
                                             <User className="w-4 h-4" />
                                             Profil
                                         </Link>
-                                        <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted rounded-lg">
+                                        <Link href="/dashboard" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted rounded-lg">
                                             <LayoutDashboard className="w-4 h-4" />
                                             Kabinet
                                         </Link>
@@ -155,7 +166,8 @@ export function Header() {
                         </div>
                     </form>
 
-                    {navItems.map((item) => {
+                    {/* Mobile Nav - Only on landing page */}
+                    {isLandingPage && navItems.map((item) => {
                         const isActive = pathname === item.href;
                         const Icon = item.icon;
                         return (
