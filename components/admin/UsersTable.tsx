@@ -1,0 +1,166 @@
+"use client";
+
+import { useState } from 'react';
+import {
+    Search,
+    Shield,
+    Trash2
+} from 'lucide-react';
+import { UserRole } from '@/lib/permissions';
+import { updateUserRole, deleteUser } from '@/app/admin/users/actions';
+
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    university?: string;
+    created_at: string;
+}
+
+interface UsersTableProps {
+    users: User[];
+}
+
+export function UsersTable({ users: initialUsers }: UsersTableProps) {
+    const [users, setUsers] = useState(initialUsers);
+    const [search, setSearch] = useState('');
+    const [isLoading, setIsLoading] = useState<string | null>(null);
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    const filteredUsers = users.filter(user =>
+        user.name?.toLowerCase().includes(search.toLowerCase()) ||
+        user.email?.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const handleRoleUpdate = async (userId: string, newRole: UserRole) => {
+        setIsLoading(userId);
+        try {
+            const result = await updateUserRole(userId, newRole);
+            if (result.success) {
+                setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+                setEditingId(null);
+            } else {
+                alert('Failed to update role');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(null);
+        }
+    };
+
+    const handleDelete = async (userId: string) => {
+        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+
+        setIsLoading(userId);
+        try {
+            const result = await deleteUser(userId);
+            if (result.success) {
+                setUsers(users.filter(u => u.id !== userId));
+            } else {
+                alert('Failed to delete user');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(null);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            {/* Search */}
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                    type="text"
+                    placeholder="Foydalanuvchilarni qidirish..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                />
+            </div>
+
+            {/* Table */}
+            <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-muted/50 text-muted-foreground font-medium">
+                            <tr>
+                                <th className="px-4 py-3">Foydalanuvchi</th>
+                                <th className="px-4 py-3">Email</th>
+                                <th className="px-4 py-3">Universitet</th>
+                                <th className="px-4 py-3">Rol</th>
+                                <th className="px-4 py-3 text-right">Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                            {filteredUsers.map((user) => (
+                                <tr key={user.id} className="hover:bg-muted/30 transition-colors">
+                                    <td className="px-4 py-3 font-medium">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                                {user.name?.charAt(0).toUpperCase() || 'U'}
+                                            </div>
+                                            {user.name || 'Nomsiz'}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
+                                    <td className="px-4 py-3 text-muted-foreground">{user.university || '-'}</td>
+                                    <td className="px-4 py-3">
+                                        {editingId === user.id ? (
+                                            <select
+                                                value={user.role}
+                                                onChange={(e) => handleRoleUpdate(user.id, e.target.value as UserRole)}
+                                                disabled={isLoading === user.id}
+                                                className="bg-background border border-border rounded px-2 py-1 text-xs"
+                                            >
+                                                <option value="USER">User</option>
+                                                <option value="LIBRARIAN">Kutubxonachi</option>
+                                                <option value="MODERATOR">Moderator</option>
+                                                <option value="SUPER_ADMIN">Super Admin</option>
+                                            </select>
+                                        ) : (
+                                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${user.role === 'SUPER_ADMIN' ? 'bg-red-500/10 text-red-500' :
+                                                    user.role === 'MODERATOR' ? 'bg-purple-500/10 text-purple-500' :
+                                                        user.role === 'LIBRARIAN' ? 'bg-blue-500/10 text-blue-500' :
+                                                            'bg-gray-500/10 text-gray-500'
+                                                }`}>
+                                                {user.role}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => setEditingId(editingId === user.id ? null : user.id)}
+                                                className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary"
+                                                title="Rolni o'zgartirish"
+                                            >
+                                                <Shield className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(user.id)}
+                                                disabled={isLoading === user.id}
+                                                className="p-1.5 hover:bg-red-500/10 rounded-lg transition-colors text-muted-foreground hover:text-red-500"
+                                                title="O'chirish"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {filteredUsers.length === 0 && (
+                    <div className="p-8 text-center text-muted-foreground">
+                        Foydalanuvchilar topilmadi
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
