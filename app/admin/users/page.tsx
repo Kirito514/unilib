@@ -4,22 +4,47 @@ import { Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-async function getUsers() {
+async function getUsers(page: number = 1, limit: number = 10) {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    // Get total count
+    const { count, error: countError } = await supabaseAdmin
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+    if (countError) {
+        console.error('Error fetching users count:', countError);
+        return { users: [], totalUsers: 0, totalPages: 0 };
+    }
+
+    // Get paginated data
     const { data: users, error } = await supabaseAdmin
         .from('profiles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
     if (error) {
         console.error('Error fetching users:', error);
-        return [];
+        return { users: [], totalUsers: 0, totalPages: 0 };
     }
 
-    return users;
+    return {
+        users: users || [],
+        totalUsers: count || 0,
+        totalPages: Math.ceil((count || 0) / limit)
+    };
 }
 
-export default async function UsersPage() {
-    const users = await getUsers();
+interface PageProps {
+    searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default async function UsersPage({ searchParams }: PageProps) {
+    const page = Number(searchParams?.page) || 1;
+    const limit = 10;
+    const { users, totalUsers, totalPages } = await getUsers(page, limit);
 
     return (
         <div className="space-y-6">
@@ -33,12 +58,14 @@ export default async function UsersPage() {
                         Tizimdagi barcha foydalanuvchilarni boshqarish
                     </p>
                 </div>
-                <div className="bg-card border border-border px-4 py-2 rounded-lg font-medium">
-                    Jami: <span className="text-primary">{users.length}</span>
-                </div>
             </div>
 
-            <UsersTable users={users} />
+            <UsersTable
+                users={users}
+                page={page}
+                totalPages={totalPages}
+                totalUsers={totalUsers}
+            />
         </div>
     );
 }

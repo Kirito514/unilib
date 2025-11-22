@@ -22,11 +22,11 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            const success = await login(email, password);
-            if (success) {
+            const result = await login(email, password);
+            if (result.success) {
                 router.push('/dashboard');
             } else {
-                setError('Foydalanuvchi topilmadi yoki parol noto\'g\'ri. Ro\'yxatdan o\'tmaganmisiz?');
+                setError(result.error || 'Foydalanuvchi topilmadi yoki parol noto\'g\'ri. Ro\'yxatdan o\'tmaganmisiz?');
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');

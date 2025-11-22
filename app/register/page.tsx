@@ -45,14 +45,21 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            const success = await register(
+            const result = await register(
                 formData.name,
                 formData.email,
                 formData.password,
                 formData.university
             );
-            if (success) {
+
+            if (result.success) {
                 router.push('/dashboard');
+            } else {
+                if (result.error?.includes('User already registered')) {
+                    setError('Bu email bilan allaqachon ro\'yxatdan o\'tilgan. Iltimos, tizimga kiring.');
+                } else {
+                    setError(result.error || 'Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+                }
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');

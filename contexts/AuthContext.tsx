@@ -15,8 +15,8 @@ interface User {
 
 interface AuthContextType {
     user: User | null;
-    login: (email: string, password: string) => Promise<boolean>;
-    register: (name: string, email: string, password: string, university?: string) => Promise<boolean>;
+    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    register: (name: string, email: string, password: string, university?: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
     isLoading: boolean;
     hasPermission: (permission: Permission) => boolean;
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     };
 
-    const login = async (email: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (error) {
                 console.error('Login error:', error.message);
-                return false;
+                return { success: false, error: error.message };
             }
 
             // Don't wait for profile fetch here to speed up UI transition
@@ -118,17 +118,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     name: data.user.email!.split('@')[0], // Temporary name
                     role: 'USER' // Temporary role
                 });
-                return true;
+                return { success: true };
             }
 
-            return false;
-        } catch (error) {
+            return { success: false, error: 'Login failed' };
+        } catch (error: any) {
             console.error('Login error:', error);
-            return false;
+            return { success: false, error: error.message || 'An unexpected error occurred' };
         }
     };
 
-    const register = async (name: string, email: string, password: string, university?: string): Promise<boolean> => {
+    const register = async (name: string, email: string, password: string, university?: string): Promise<{ success: boolean; error?: string }> => {
         try {
             // Sign up the user with metadata
             const { data, error } = await supabase.auth.signUp({
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (error) {
                 console.error('Registration error:', error.message);
-                return false;
+                return { success: false, error: error.message };
             }
 
             if (data.user) {
@@ -157,13 +157,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     university: university,
                     role: 'USER'
                 });
-                return true;
+                return { success: true };
             }
 
-            return false;
-        } catch (error) {
+            return { success: false, error: 'Registration failed' };
+        } catch (error: any) {
             console.error('Registration error:', error);
-            return false;
+            return { success: false, error: error.message || 'An unexpected error occurred' };
         }
     };
 

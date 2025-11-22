@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     Search,
     Shield,
@@ -14,19 +15,30 @@ interface User {
     name: string;
     email: string;
     role: UserRole;
+
+
     university?: string;
     created_at: string;
 }
 
 interface UsersTableProps {
     users: User[];
+    page: number;
+    totalPages: number;
+    totalUsers: number;
 }
 
-export function UsersTable({ users: initialUsers }: UsersTableProps) {
+export function UsersTable({ users: initialUsers, page, totalPages, totalUsers }: UsersTableProps) {
     const [users, setUsers] = useState(initialUsers);
     const [search, setSearch] = useState('');
     const [isLoading, setIsLoading] = useState<string | null>(null);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const router = useRouter();
+
+    // Update local state when initialUsers changes (e.g. on page change)
+    useEffect(() => {
+        setUsers(initialUsers);
+    }, [initialUsers]);
 
     const filteredUsers = users.filter(user =>
         user.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -66,6 +78,11 @@ export function UsersTable({ users: initialUsers }: UsersTableProps) {
         } finally {
             setIsLoading(null);
         }
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage < 1 || newPage > totalPages) return;
+        router.push(`/admin/users?page=${newPage}`);
     };
 
     return (
@@ -123,9 +140,9 @@ export function UsersTable({ users: initialUsers }: UsersTableProps) {
                                             </select>
                                         ) : (
                                             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${user.role === 'SUPER_ADMIN' ? 'bg-red-500/10 text-red-500' :
-                                                    user.role === 'MODERATOR' ? 'bg-purple-500/10 text-purple-500' :
-                                                        user.role === 'LIBRARIAN' ? 'bg-blue-500/10 text-blue-500' :
-                                                            'bg-gray-500/10 text-gray-500'
+                                                user.role === 'MODERATOR' ? 'bg-purple-500/10 text-purple-500' :
+                                                    user.role === 'LIBRARIAN' ? 'bg-blue-500/10 text-blue-500' :
+                                                        'bg-gray-500/10 text-gray-500'
                                                 }`}>
                                                 {user.role}
                                             </span>
@@ -160,6 +177,32 @@ export function UsersTable({ users: initialUsers }: UsersTableProps) {
                         Foydalanuvchilar topilmadi
                     </div>
                 )}
+
+                {/* Pagination Controls */}
+                <div className="p-4 border-t border-border flex items-center justify-between">
+                    <div className="text-sm text-muted-foreground">
+                        Jami: <span className="font-medium text-foreground">{totalUsers}</span> ta foydalanuvchi
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => handlePageChange(page - 1)}
+                            disabled={page <= 1}
+                            className="px-3 py-1 text-sm border border-border rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Oldingi
+                        </button>
+                        <span className="text-sm font-medium">
+                            {page} / {totalPages}
+                        </span>
+                        <button
+                            onClick={() => handlePageChange(page + 1)}
+                            disabled={page >= totalPages}
+                            className="px-3 py-1 text-sm border border-border rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Keyingi
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
