@@ -111,6 +111,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Don't wait for profile fetch here to speed up UI transition
             // onAuthStateChange will handle setting the user
             if (data.user) {
+                // Optimistically set user to prevent ProtectedRoute from redirecting
+                setUser({
+                    id: data.user.id,
+                    email: data.user.email!,
+                    name: data.user.email!.split('@')[0], // Temporary name
+                    role: 'USER' // Temporary role
+                });
                 return true;
             }
 
@@ -161,8 +168,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = async () => {
-        await supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
         setUser(null);
+        // Force clear any potential stale state
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('sb-access-token');
+            localStorage.removeItem('sb-refresh-token');
+        }
+        // Force reload to clear Next.js client cache
+        window.location.href = '/login';
     };
 
     const checkPermission = (permission: Permission): boolean => {
