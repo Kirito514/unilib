@@ -6,13 +6,13 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { Search, User, BookOpen, Users, LayoutDashboard, Award, Menu, X, Sun, Moon, LogOut, Quote, Sparkles, Info, Mail, Trophy, Calendar } from 'lucide-react';
+import { Search, User, BookOpen, Users, LayoutDashboard, Award, Menu, X, Sun, Moon, LogOut, Quote, Sparkles, Info, Mail, Trophy, Calendar, Shield } from 'lucide-react';
 
 export function Header() {
     const pathname = usePathname();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
-    const { user, logout } = useAuth();
+    const { user, logout, isAdmin } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -144,6 +144,12 @@ export function Header() {
                                         <div className="px-3 py-2 border-b border-border mb-2">
                                             <p className="font-semibold text-sm">{user.name}</p>
                                         </div>
+                                        {isAdmin() && (
+                                            <Link href="/admin" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted rounded-lg transition-colors font-medium text-primary">
+                                                <Shield className="w-4 h-4" />
+                                                Admin Panel
+                                            </Link>
+                                        )}
                                         <Link href="/profile" onClick={() => setIsUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted rounded-lg transition-colors">
                                             <User className="w-4 h-4" />
                                             Profil
@@ -179,7 +185,7 @@ export function Header() {
             </div>
 
             {/* Mobile Menu - Improved spacing and touch targets */}
-            <div className={`md:hidden border-t border-border bg-card ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+            <div className={`md:hidden border-t border-border bg-card ${isMobileMenuOpen ? 'block' : 'hidden'} max-h-[calc(100vh-4rem)] overflow-y-auto`}>
                 <div className="container px-4 py-4 space-y-2">
                     {/* Search - Larger touch target */}
                     {user && (
@@ -218,6 +224,22 @@ export function Header() {
                     {/* User Menu Items */}
                     {user ? (
                         <div className="pt-2 border-t border-border space-y-2 mt-3">
+                            <div className="px-4 py-2">
+                                <p className="font-semibold text-base">{user.name}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                            </div>
+
+                            {isAdmin() && (
+                                <Link
+                                    href="/admin"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center gap-3 px-4 py-3.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors min-h-[48px] text-base font-medium"
+                                >
+                                    <Shield className="w-5 h-5 flex-shrink-0" />
+                                    Admin Panel
+                                </Link>
+                            )}
+
                             <Link
                                 href="/profile"
                                 onClick={() => setIsMobileMenuOpen(false)}
