@@ -22,6 +22,8 @@ interface UserAchievement extends Achievement {
     seen: boolean;
 }
 
+import { markAchievementsAsSeen } from './actions';
+
 export default function AchievementsPage() {
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -41,6 +43,26 @@ export default function AchievementsPage() {
             fetchData();
         }
     }, [user]);
+
+    // Mark unseen achievements as seen
+    useEffect(() => {
+        if (userAchievements.length > 0) {
+            const unseenIds = userAchievements
+                .filter(ua => !ua.seen)
+                .map(ua => ua.id);
+
+            if (unseenIds.length > 0) {
+                // Mark as seen after a short delay to allow user to see the "New" badge
+                const timer = setTimeout(() => {
+                    if (user) {
+                        markAchievementsAsSeen(unseenIds, user.id);
+                    }
+                }, 3000);
+
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [userAchievements]);
 
     const fetchData = async () => {
         try {
@@ -119,46 +141,91 @@ export default function AchievementsPage() {
     return (
         <ProtectedRoute>
             <div className="container py-10 px-4 md:px-6 max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold tracking-tight mb-2">
-                        🏆 Yutuqlarim
-                    </h1>
-                    <p className="text-muted-foreground">
-                        O'qish yutuqlaringizni kuzating va yangi maqsadlarga erishing
-                    </p>
-                </div>
+                {/* XP Progress & Stats */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    {/* XP Card */}
+                    <div className="lg:col-span-2 bg-gradient-to-br from-card to-card/50 border border-border rounded-2xl p-8 shadow-sm relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                            <span className="text-3xl">⭐</span> Daraja va XP
+                        </h2>
+                        <XPProgressBar
+                            currentXP={userStats.xp}
+                            currentLevel={userStats.level}
+                            showDetails={true}
+                        />
 
-                {/* XP Progress */}
-                <div className="bg-card border border-border rounded-xl p-6 mb-8">
-                    <XPProgressBar
-                        currentXP={userStats.xp}
-                        currentLevel={userStats.level}
-                        showDetails={true}
-                    />
-                </div>
+                        <div className="mt-8 pt-6 border-t border-border/50">
+                            <h3 className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+                                Keyingi darajaga tezroq yetish uchun:
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="bg-background/40 p-3 rounded-xl flex items-center gap-3 border border-border/50 hover:bg-background/60 transition-colors">
+                                    <div className="p-2 bg-blue-500/10 text-blue-500 rounded-lg">
+                                        📚
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-bold">+200 XP</div>
+                                        <div className="text-xs text-muted-foreground">Kitob tugating</div>
+                                    </div>
+                                </div>
+                                <div className="bg-background/40 p-3 rounded-xl flex items-center gap-3 border border-border/50 hover:bg-background/60 transition-colors">
+                                    <div className="p-2 bg-orange-500/10 text-orange-500 rounded-lg">
+                                        🔥
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-bold">+50 XP</div>
+                                        <div className="text-xs text-muted-foreground">Kunlik streak</div>
+                                    </div>
+                                </div>
+                                <div className="bg-background/40 p-3 rounded-xl flex items-center gap-3 border border-border/50 hover:bg-background/60 transition-colors">
+                                    <div className="p-2 bg-green-500/10 text-green-500 rounded-lg">
+                                        🎯
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-bold">+50 XP</div>
+                                        <div className="text-xs text-muted-foreground">Kunlik maqsad</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-card border border-border rounded-xl p-4 text-center">
-                        <div className="text-3xl mb-2">🔥</div>
-                        <div className="text-2xl font-bold text-primary">{userStats.streak}</div>
-                        <div className="text-sm text-muted-foreground">Kunlik Streak</div>
-                    </div>
-                    <div className="bg-card border border-border rounded-xl p-4 text-center">
-                        <div className="text-3xl mb-2">📚</div>
-                        <div className="text-2xl font-bold text-primary">{userStats.booksCompleted}</div>
-                        <div className="text-sm text-muted-foreground">Kitoblar</div>
-                    </div>
-                    <div className="bg-card border border-border rounded-xl p-4 text-center">
-                        <div className="text-3xl mb-2">📄</div>
-                        <div className="text-2xl font-bold text-primary">{userStats.pagesRead}</div>
-                        <div className="text-sm text-muted-foreground">Sahifalar</div>
-                    </div>
-                    <div className="bg-card border border-border rounded-xl p-4 text-center">
-                        <div className="text-3xl mb-2">🎯</div>
-                        <div className="text-2xl font-bold text-primary">{userStats.dailyGoalsCompleted}</div>
-                        <div className="text-sm text-muted-foreground">Kunlik Maqsad</div>
+                    {/* Quick Stats */}
+                    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm h-full">
+                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                            <span className="text-2xl">📊</span> Statistika
+                        </h2>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors rounded-xl border border-border/50">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">🔥</span>
+                                    <span className="text-sm font-medium text-muted-foreground">Streak</span>
+                                </div>
+                                <span className="text-lg font-bold text-foreground">{userStats.streak} kun</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors rounded-xl border border-border/50">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">📚</span>
+                                    <span className="text-sm font-medium text-muted-foreground">Kitoblar</span>
+                                </div>
+                                <span className="text-lg font-bold text-foreground">{userStats.booksCompleted}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors rounded-xl border border-border/50">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">📄</span>
+                                    <span className="text-sm font-medium text-muted-foreground">Sahifalar</span>
+                                </div>
+                                <span className="text-lg font-bold text-foreground">{userStats.pagesRead}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 bg-muted/30 hover:bg-muted/50 transition-colors rounded-xl border border-border/50">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">🎯</span>
+                                    <span className="text-sm font-medium text-muted-foreground">Maqsadlar</span>
+                                </div>
+                                <span className="text-lg font-bold text-foreground">{userStats.dailyGoalsCompleted}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -166,6 +233,7 @@ export default function AchievementsPage() {
                 <AchievementsList
                     achievements={achievements}
                     userAchievements={userAchievements}
+                    userStats={userStats}
                 />
             </div>
         </ProtectedRoute>

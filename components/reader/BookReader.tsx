@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { CelebrationModal } from '@/components/gamification/CelebrationModal';
 import { toast } from 'sonner';
+import { createNotification } from '@/app/notifications/actions';
 
 // Configure PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -62,15 +63,24 @@ export function BookReader({ fileUrl, bookTitle, bookId, onClose }: BookReaderPr
 
                 console.log('Checking schedule for date:', today);
 
-                const { data: scheduleData } = await supabase
+                // Debugging: Fetch all schedules for this book to see why it's not matching
+                const { data: allSchedules } = await supabase
                     .from('reading_schedule')
                     .select('*')
                     .eq('user_id', user.id)
-                    .eq('book_id', bookId)
-                    .eq('status', 'active')
-                    .lte('start_date', today)
-                    .gte('end_date', today)
-                    .single();
+                    .eq('book_id', bookId);
+
+                console.log('Debug - All schedules for book:', allSchedules);
+                console.log('Debug - Today:', today);
+
+                // Find matching schedule in JS to debug logic
+                const scheduleData = allSchedules?.find(s => {
+                    const isActive = s.status === 'active';
+                    const isStarted = s.start_date <= today;
+                    const isNotEnded = s.end_date >= today;
+                    console.log(`Schedule ${s.id}: active=${isActive}, started=${isStarted} (${s.start_date} <= ${today}), notEnded=${isNotEnded} (${s.end_date} >= ${today})`);
+                    return isActive && isStarted && isNotEnded;
+                });
 
                 if (scheduleData) {
                     console.log('Found active schedule:', scheduleData);
@@ -156,6 +166,16 @@ export function BookReader({ fileUrl, bookTitle, bookId, onClose }: BookReaderPr
                         pages_read: totalDailyPages,
                         goal: dailyGoal
                     });
+
+                    // Create persistent notification
+                    if (user) {
+                        createNotification(
+                            user.id,
+                            'Kunlik maqsad bajarildi! 🎉',
+                            `Tabriklaymiz! Siz bugungi o'qish rejasini bajardingiz (${dailyGoal} sahifa).`,
+                            'achievement'
+                        );
+                    }
                 }
 
                 const { data: dailyData, error: dailyError } = await supabase

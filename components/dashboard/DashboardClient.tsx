@@ -188,21 +188,25 @@ export function DashboardClient({
                                         <p className="text-muted-foreground text-sm mb-3">{activeSchedule.books?.author}</p>
                                         <div className="flex items-center gap-4 text-sm">
                                             {activeSchedule.daily_goal_pages && (
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="flex items-center gap-1">
-                                                        <Target className="w-4 h-4 text-primary" />
-                                                        Kunlik: <strong>{activeSchedule.daily_goal_pages} sahifa</strong>
-                                                    </span>
-                                                    <div className="w-full h-1.5 bg-background/50 rounded-full overflow-hidden mt-1">
+                                                <div className="flex flex-col gap-2 w-full">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="flex items-center gap-1">
+                                                            <Target className="w-4 h-4 text-primary" />
+                                                            Kunlik: <strong>{activeSchedule.daily_goal_pages} sahifa</strong>
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="w-full h-2 bg-background/50 rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full bg-primary rounded-full transition-all"
+                                                            className={`h-full rounded-full transition-all ${(todayProgress?.pages_read || 0) >= activeSchedule.daily_goal_pages ? 'bg-green-500' : 'bg-primary'}`}
                                                             style={{
                                                                 width: `${Math.min(100, ((todayProgress?.pages_read || 0) / activeSchedule.daily_goal_pages) * 100)}%`
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        Bugun: {todayProgress?.pages_read || 0} sahifa o'qildi
+                                                    <span className="text-xs text-muted-foreground flex justify-between">
+                                                        <span>Bugun: {todayProgress?.pages_read || 0} sahifa o'qildi</span>
+                                                        <span>{Math.round(((todayProgress?.pages_read || 0) / activeSchedule.daily_goal_pages) * 100)}%</span>
                                                     </span>
                                                 </div>
                                             )}
@@ -216,13 +220,24 @@ export function DashboardClient({
                                     </div>
                                 </div>
 
-                                <Link
-                                    href={`/reader/${activeSchedule.book_id}`}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-medium"
-                                >
-                                    <BookOpen className="w-4 h-4" />
-                                    O'qishni boshlash
-                                </Link>
+                                {(todayProgress?.pages_read || 0) >= (activeSchedule.daily_goal_pages || Infinity) ? (
+                                    <div className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-green-500/10 text-green-500 rounded-xl border border-green-500/20 font-bold text-lg animate-in fade-in zoom-in duration-300">
+                                        <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </div>
+                                        Bugungi reja bajarildi! 🎉
+                                    </div>
+                                ) : (
+                                    <Link
+                                        href={`/reader/${activeSchedule.book_id}`}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-medium"
+                                    >
+                                        <BookOpen className="w-4 h-4" />
+                                        O'qishni boshlash
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     )}

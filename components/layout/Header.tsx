@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { Search, User, BookOpen, Users, LayoutDashboard, Award, Menu, X, Sun, Moon, LogOut, Quote, Sparkles, Info, Mail } from 'lucide-react';
 
 export function Header() {
@@ -104,6 +105,9 @@ export function Header() {
                             />
                         </div>
                     </form>
+
+                    {/* Notifications */}
+                    {user && <NotificationBell />}
 
                     {/* Theme */}
                     {mounted && (

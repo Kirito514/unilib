@@ -1,6 +1,6 @@
-"use client";
-
+import { useState } from 'react';
 import { AchievementBadge } from './AchievementBadge';
+import { Trophy, Lock, Unlock, Grid } from 'lucide-react';
 
 interface Achievement {
     id: string;
@@ -14,16 +14,71 @@ interface Achievement {
     seen?: boolean;
 }
 
+interface UserStats {
+    xp: number;
+    level: number;
+    streak: number;
+    booksCompleted: number;
+    pagesRead: number;
+    dailyGoalsCompleted: number;
+}
+
 interface AchievementsListProps {
     achievements: Achievement[];
     userAchievements: Achievement[];
+    userStats: UserStats;
 }
 
-export function AchievementsList({ achievements, userAchievements }: AchievementsListProps) {
+export function AchievementsList({ achievements, userAchievements, userStats }: AchievementsListProps) {
+    const [activeTab, setActiveTab] = useState<'all' | 'unlocked' | 'locked'>('all');
+
     // Create a map of unlocked achievements for quick lookup
     const unlockedMap = new Map(
         userAchievements.map(ua => [ua.key, { unlocked_at: ua.unlocked_at, seen: ua.seen }])
     );
+
+    // Helper to calculate progress
+    const getProgress = (key: string) => {
+        let current = 0;
+        let target = 1;
+
+        if (key.includes('book')) {
+            current = userStats.booksCompleted;
+            if (key.includes('first')) target = 1;
+            else if (key.includes('5')) target = 5;
+            else if (key.includes('10')) target = 10;
+            else if (key.includes('25')) target = 25;
+            else if (key.includes('50')) target = 50;
+            else if (key.includes('100')) target = 100;
+        } else if (key.includes('streak')) {
+            current = userStats.streak;
+            if (key.includes('3')) target = 3;
+            else if (key.includes('7')) target = 7;
+            else if (key.includes('14')) target = 14;
+            else if (key.includes('30')) target = 30;
+        } else if (key.includes('page')) {
+            current = userStats.pagesRead;
+            if (key.includes('100')) target = 100;
+            else if (key.includes('500')) target = 500;
+            else if (key.includes('1000')) target = 1000;
+            else if (key.includes('5000')) target = 5000;
+        } else if (key.includes('goal')) {
+            current = userStats.dailyGoalsCompleted;
+            if (key.includes('1')) target = 1;
+            else if (key.includes('7')) target = 7;
+            else if (key.includes('30')) target = 30;
+        }
+
+        return { current, target };
+    };
+
+    // Filter achievements based on tab
+    const filteredAchievements = achievements.filter(achievement => {
+        const isUnlocked = unlockedMap.has(achievement.key);
+        if (activeTab === 'unlocked') return isUnlocked;
+        if (activeTab === 'locked') return !isUnlocked;
+        return true;
+    });
 
     // Group achievements by tier
     const groupedByTier = {
@@ -33,7 +88,7 @@ export function AchievementsList({ achievements, userAchievements }: Achievement
         bronze: [] as Achievement[]
     };
 
-    achievements.forEach(achievement => {
+    filteredAchievements.forEach(achievement => {
         const unlockInfo = unlockedMap.get(achievement.key);
         const achievementWithUnlock = {
             ...achievement,
@@ -49,64 +104,120 @@ export function AchievementsList({ achievements, userAchievements }: Achievement
     const progressPercent = Math.round((unlockedCount / totalAchievements) * 100);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Stats Header */}
-            <div className="bg-card border border-border rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 className="text-2xl font-bold">🏆 Yutuqlar</h2>
-                        <p className="text-muted-foreground">
-                            {unlockedCount} / {totalAchievements} ochilgan
-                        </p>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-4xl font-bold text-primary">{progressPercent}%</div>
-                        <div className="text-sm text-muted-foreground">Bajarilgan</div>
-                    </div>
-                </div>
+            <div className="bg-gradient-to-br from-card to-card/50 border border-border rounded-2xl p-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-                {/* Progress Bar */}
-                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
-                        style={{ width: `${progressPercent}%` }}
-                    />
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl shadow-inner">
+                            🏆
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-bold mb-2">Yutuqlar</h2>
+                            <p className="text-muted-foreground text-lg">
+                                {unlockedCount} / {totalAchievements} ochilgan
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 w-full md:max-w-md">
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-sm font-medium text-muted-foreground">Umumiy jarayon</span>
+                            <span className="text-2xl font-bold text-primary">{progressPercent}%</span>
+                        </div>
+                        <div className="w-full h-4 bg-muted/50 rounded-full overflow-hidden p-1 border border-border/50">
+                            <div
+                                className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-1000 ease-out shadow-lg shadow-primary/20"
+                                style={{ width: `${progressPercent}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            {/* Tabs */}
+            <div className="flex p-1 bg-muted/50 rounded-xl w-full md:w-fit">
+                {[
+                    { id: 'all', label: 'Barchasi', icon: Grid },
+                    { id: 'unlocked', label: 'Ochilgan', icon: Unlock },
+                    { id: 'locked', label: 'Qulflangan', icon: Lock },
+                ].map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as any)}
+                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === tab.id
+                                ? 'bg-background text-foreground shadow-sm scale-105'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                            }`}
+                    >
+                        <tab.icon className="w-4 h-4" />
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
             {/* Achievements by Tier */}
-            {(['platinum', 'gold', 'silver', 'bronze'] as const).map(tier => {
-                const tierAchievements = groupedByTier[tier];
-                if (tierAchievements.length === 0) return null;
+            <div className="space-y-12">
+                {(['platinum', 'gold', 'silver', 'bronze'] as const).map(tier => {
+                    const tierAchievements = groupedByTier[tier];
+                    if (tierAchievements.length === 0) return null;
 
-                const tierNames = {
-                    platinum: '💎 Platinum',
-                    gold: '🥇 Gold',
-                    silver: '🥈 Silver',
-                    bronze: '🥉 Bronze'
-                };
+                    const tierConfig = {
+                        platinum: { name: 'Platinum', icon: '💎', color: 'text-cyan-400' },
+                        gold: { name: 'Gold', icon: '🥇', color: 'text-yellow-400' },
+                        silver: { name: 'Silver', icon: '🥈', color: 'text-slate-400' },
+                        bronze: { name: 'Bronze', icon: '🥉', color: 'text-amber-600' }
+                    };
 
-                return (
-                    <div key={tier}>
-                        <h3 className="text-xl font-bold mb-4">{tierNames[tier]}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {tierAchievements.map(achievement => (
-                                <AchievementBadge
-                                    key={achievement.id}
-                                    title={achievement.title}
-                                    description={achievement.description}
-                                    icon={achievement.icon}
-                                    tier={achievement.tier}
-                                    xpReward={achievement.xp_reward}
-                                    unlocked={!!achievement.unlocked_at}
-                                    unlockedAt={achievement.unlocked_at}
-                                    isNew={!!(achievement.unlocked_at && !achievement.seen)}
-                                />
-                            ))}
+                    return (
+                        <div key={tier} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="text-2xl">{tierConfig[tier].icon}</span>
+                                <h3 className={`text-2xl font-bold ${tierConfig[tier].color}`}>
+                                    {tierConfig[tier].name}
+                                </h3>
+                                <div className="h-px flex-1 bg-border/50" />
+                                <span className="text-sm text-muted-foreground font-medium px-3 py-1 rounded-full bg-muted/50">
+                                    {tierAchievements.length} ta
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {tierAchievements.map(achievement => {
+                                    const { current, target } = getProgress(achievement.key);
+                                    return (
+                                        <AchievementBadge
+                                            key={achievement.id}
+                                            title={achievement.title}
+                                            description={achievement.description}
+                                            icon={achievement.icon}
+                                            tier={achievement.tier}
+                                            xpReward={achievement.xp_reward}
+                                            unlocked={!!achievement.unlocked_at}
+                                            unlockedAt={achievement.unlocked_at}
+                                            isNew={!!(achievement.unlocked_at && !achievement.seen)}
+                                            progress={current}
+                                            target={target}
+                                        />
+                                    );
+                                })}
+                            </div>
                         </div>
+                    );
+                })}
+
+                {filteredAchievements.length === 0 && (
+                    <div className="text-center py-20">
+                        <div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl grayscale opacity-50">
+                            🏆
+                        </div>
+                        <h3 className="text-xl font-semibold mb-2">Hech narsa topilmadi</h3>
+                        <p className="text-muted-foreground">Bu kategoriyada yutuqlar yo'q</p>
                     </div>
-                );
-            })}
+                )}
+            </div>
         </div>
     );
 }

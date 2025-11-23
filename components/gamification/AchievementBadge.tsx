@@ -9,20 +9,29 @@ interface AchievementBadgeProps {
     unlocked?: boolean;
     unlockedAt?: string;
     isNew?: boolean;
+    progress?: number;
+    target?: number;
 }
 
 const tierColors = {
-    bronze: 'from-amber-700 to-amber-900',
-    silver: 'from-gray-400 to-gray-600',
-    gold: 'from-yellow-400 to-yellow-600',
-    platinum: 'from-cyan-400 to-blue-600'
+    bronze: 'from-amber-700/80 to-amber-900/80',
+    silver: 'from-slate-400/80 to-slate-600/80',
+    gold: 'from-yellow-400/80 to-yellow-600/80',
+    platinum: 'from-cyan-400/80 to-blue-600/80'
 };
 
 const tierBorders = {
-    bronze: 'border-amber-700',
-    silver: 'border-gray-400',
-    gold: 'border-yellow-400',
-    platinum: 'border-cyan-400'
+    bronze: 'border-amber-700/50',
+    silver: 'border-slate-400/50',
+    gold: 'border-yellow-400/50',
+    platinum: 'border-cyan-400/50'
+};
+
+const tierGlows = {
+    bronze: 'shadow-amber-900/20',
+    silver: 'shadow-slate-900/20',
+    gold: 'shadow-yellow-900/20',
+    platinum: 'shadow-cyan-900/20'
 };
 
 export function AchievementBadge({
@@ -33,63 +42,89 @@ export function AchievementBadge({
     xpReward,
     unlocked = false,
     unlockedAt,
-    isNew = false
+    isNew = false,
+    progress = 0,
+    target = 100
 }: AchievementBadgeProps) {
+    const percent = Math.min(100, Math.round((progress / target) * 100));
+
     return (
         <div
-            className={`relative group rounded-xl p-4 border-2 transition-all duration-300 ${unlocked
-                    ? `bg-gradient-to-br ${tierColors[tier]} ${tierBorders[tier]} hover:scale-105 hover:shadow-xl`
-                    : 'bg-card border-border opacity-50 grayscale hover:opacity-70'
+            className={`relative group rounded-2xl p-6 border transition-all duration-500 overflow-hidden ${unlocked
+                ? `bg-gradient-to-br ${tierColors[tier]} ${tierBorders[tier]} shadow-lg ${tierGlows[tier]} hover:scale-[1.02] hover:shadow-xl`
+                : 'bg-card/50 border-border/50 hover:bg-card/80'
                 }`}
         >
+            {/* Background Pattern */}
+            {unlocked && (
+                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.8),transparent)]" />
+            )}
+
             {/* New Badge */}
             {isNew && unlocked && (
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
-                    YANGI!
+                <div className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-lg">
+                    YANGI
                 </div>
             )}
 
-            {/* Icon */}
-            <div className="text-center mb-3">
-                <div className={`text-5xl mb-2 ${unlocked ? 'animate-bounce' : ''}`}>
-                    {icon}
+            <div className="relative z-10 flex flex-col h-full">
+                {/* Icon & Title */}
+                <div className="flex items-start gap-4 mb-4">
+                    <div className={`text-4xl p-3 rounded-xl bg-background/10 backdrop-blur-sm ${unlocked ? 'shadow-inner' : 'grayscale opacity-50'}`}>
+                        {icon}
+                    </div>
+                    <div>
+                        <h3 className={`font-bold text-lg leading-tight mb-1 ${unlocked ? 'text-white' : 'text-foreground'}`}>
+                            {title}
+                        </h3>
+                        <div className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${unlocked ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}`}>
+                            {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                        </div>
+                    </div>
                 </div>
-                <h3 className={`font-bold text-lg ${unlocked ? 'text-white' : 'text-foreground'}`}>
-                    {title}
-                </h3>
+
+                {/* Description */}
+                <p className={`text-sm mb-4 flex-grow ${unlocked ? 'text-white/90' : 'text-muted-foreground'}`}>
+                    {description}
+                </p>
+
+                {/* Footer: XP & Date or Progress */}
+                <div className="mt-auto">
+                    {unlocked ? (
+                        <div className="flex items-center justify-between text-xs text-white/80 border-t border-white/10 pt-3">
+                            <span className="font-semibold text-yellow-300 flex items-center gap-1">
+                                ⚡ +{xpReward} XP
+                            </span>
+                            {unlockedAt && (
+                                <span>
+                                    {new Date(unlockedAt).toLocaleDateString('uz-UZ', {
+                                        day: 'numeric',
+                                        month: 'short'
+                                    })}
+                                </span>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                                <span>Jarayon</span>
+                                <span>{progress} / {target}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-primary transition-all duration-500"
+                                    style={{ width: `${percent}%` }}
+                                />
+                            </div>
+                            <div className="flex justify-end">
+                                <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                                    🔒 +{xpReward} XP
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-
-            {/* Description */}
-            <p className={`text-sm text-center mb-3 ${unlocked ? 'text-white/90' : 'text-muted-foreground'}`}>
-                {description}
-            </p>
-
-            {/* XP Reward */}
-            <div className="flex items-center justify-center gap-2">
-                <span className={`text-sm font-semibold ${unlocked ? 'text-yellow-300' : 'text-muted-foreground'}`}>
-                    +{xpReward} XP
-                </span>
-            </div>
-
-            {/* Unlocked Date */}
-            {unlocked && unlockedAt && (
-                <div className="mt-2 text-center">
-                    <span className="text-xs text-white/70">
-                        {new Date(unlockedAt).toLocaleDateString('uz-UZ', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                        })}
-                    </span>
-                </div>
-            )}
-
-            {/* Lock Icon for Locked Achievements */}
-            {!unlocked && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-6xl opacity-20">🔒</div>
-                </div>
-            )}
         </div>
     );
 }
