@@ -46,6 +46,7 @@ export default function SchedulePage() {
                         )
                     `)
                     .eq('user_id', user?.id)
+                    .neq('status', 'deleted')
                     .order('start_date', { ascending: true }),
                 supabase
                     .from('daily_progress')
