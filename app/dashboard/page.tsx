@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase/client';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -29,11 +29,15 @@ export default function DashboardPage() {
     const [weeklyPages, setWeeklyPages] = useState(0);
     const [todayProgress, setTodayProgress] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const hasFetchedRef = useRef(false);
 
     useEffect(() => {
-        // Fetch data immediately - ProtectedRoute ensures user exists
-        fetchDashboardData();
-    }, []); // Empty dependency - fetch once on mount
+        // Fetch only once when user becomes available
+        if (user && !hasFetchedRef.current) {
+            hasFetchedRef.current = true;
+            fetchDashboardData();
+        }
+    }, [user]); // Depend on user, but only fetch once
 
     const fetchDashboardData = async () => {
         try {
