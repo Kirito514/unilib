@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, Clock, BookOpen } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { updateSchedule } from '@/app/schedule/actions';
+import { toast } from 'sonner';
 
 interface Book {
     id: string;
@@ -16,9 +18,10 @@ interface ScheduleBookModalProps {
     onClose: () => void;
     onScheduleCreated: () => void;
     selectedDate?: Date;
+    editingSchedule?: any;
 }
 
-export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selectedDate }: ScheduleBookModalProps) {
+export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selectedDate, editingSchedule }: ScheduleBookModalProps) {
     const [books, setBooks] = useState<Book[]>([]);
     const [selectedBook, setSelectedBook] = useState('');
     const [startDate, setStartDate] = useState('');
@@ -31,16 +34,30 @@ export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selected
     useEffect(() => {
         if (isOpen) {
             fetchBooks();
-            if (selectedDate) {
+
+            // If editing, pre-fill form
+            if (editingSchedule) {
+                setSelectedBook(editingSchedule.book_id);
+                setStartDate(editingSchedule.start_date);
+                setEndDate(editingSchedule.end_date);
+
+                if (editingSchedule.daily_goal_pages) {
+                    setGoalType('pages');
+                    setDailyGoalPages(editingSchedule.daily_goal_pages);
+                } else if (editingSchedule.daily_goal_minutes) {
+                    setGoalType('minutes');
+                    setDailyGoalMinutes(editingSchedule.daily_goal_minutes);
+                }
+            } else if (selectedDate) {
+                // If creating new, use selected date
                 const dateStr = selectedDate.toISOString().split('T')[0];
                 setStartDate(dateStr);
-                // Default to 10 days later
                 const end = new Date(selectedDate);
                 end.setDate(end.getDate() + 10);
                 setEndDate(end.toISOString().split('T')[0]);
             }
         }
-    }, [isOpen, selectedDate]);
+    }, [isOpen, selectedDate, editingSchedule]);
 
     const fetchBooks = async () => {
         const { data } = await supabase
@@ -71,31 +88,52 @@ export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selected
         setLoading(true);
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('Not authenticated');
+            if (editingSchedule) {
+                // Update existing schedule
+                const result = await updateSchedule(editingSchedule.id, {
+                    start_date: startDate,
+                    end_date: endDate,
+                    daily_goal_pages: goalType === 'pages' ? dailyGoalPages : undefined,
+                    daily_goal_minutes: goalType === 'minutes' ? dailyGoalMinutes : undefined,
+                });
 
-            const scheduleData = {
-                user_id: user.id,
-                book_id: selectedBook,
-                start_date: startDate,
-                end_date: endDate,
-                daily_goal_pages: goalType === 'pages' ? dailyGoalPages : null,
-                daily_goal_minutes: goalType === 'minutes' ? dailyGoalMinutes : null,
-                status: 'active'
-            };
+                if (result.success) {
+                    toast.success('Reja muvaffaqiyatli yangilandi');
+                    onScheduleCreated();
+                    onClose();
+                    resetForm();
+                } else {
+                    toast.error(result.error || 'Xatolik yuz berdi');
+                }
+            } else {
+                // Create new schedule
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) throw new Error('Not authenticated');
 
-            const { error } = await supabase
-                .from('reading_schedule')
-                .insert(scheduleData);
+                const scheduleData = {
+                    user_id: user.id,
+                    book_id: selectedBook,
+                    start_date: startDate,
+                    end_date: endDate,
+                    daily_goal_pages: goalType === 'pages' ? dailyGoalPages : null,
+                    daily_goal_minutes: goalType === 'minutes' ? dailyGoalMinutes : null,
+                    status: 'active'
+                };
 
-            if (error) throw error;
+                const { error } = await supabase
+                    .from('reading_schedule')
+                    .insert(scheduleData);
 
-            onScheduleCreated();
-            onClose();
-            resetForm();
+                if (error) throw error;
+
+                toast.success('Reja muvaffaqiyatli yaratildi');
+                onScheduleCreated();
+                onClose();
+                resetForm();
+            }
         } catch (error) {
-            console.error('Error creating schedule:', error);
-            alert('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+            console.error('Error saving schedule:', error);
+            toast.error('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
         } finally {
             setLoading(false);
         }
@@ -118,7 +156,7 @@ export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selected
             <div className="bg-card border border-border rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-border">
-                    <h2 className="text-2xl font-bold">📚 Kitobni Rejalashtirish</h2>
+                    <h2 className="text-2xl font-bold">{editingSchedule ? '✏️ Rejani Tahrirlash' : '📚 Kitobni Rejalashtirish'}</h2>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-muted rounded-lg transition-colors"
@@ -136,7 +174,8 @@ export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selected
                             value={selectedBook}
                             onChange={(e) => setSelectedBook(e.target.value)}
                             required
-                            className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none"
+                            disabled={!!editingSchedule}
+                            className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <option value="">Kitobni tanlang...</option>
                             {books.map(book => (
@@ -261,7 +300,7 @@ export function ScheduleBookModal({ isOpen, onClose, onScheduleCreated, selected
                             disabled={loading}
                             className="flex-1 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                         >
-                            {loading ? 'Saqlanmoqda...' : 'Rejalashtirish ✅'}
+                            {loading ? 'Saqlanmoqda...' : (editingSchedule ? 'Yangilash ✅' : 'Rejalashtirish ✅')}
                         </button>
                     </div>
                 </form>

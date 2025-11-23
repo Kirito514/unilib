@@ -6,6 +6,9 @@ import { ScheduleBookModal } from '@/components/schedule/ScheduleBookModal';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { Pencil, Trash2 } from 'lucide-react';
+import { updateSchedule, deleteSchedule } from './actions';
+import { toast } from 'sonner';
 
 export default function SchedulePage() {
     const { user } = useAuth();
@@ -13,6 +16,8 @@ export default function SchedulePage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date>();
     const [loading, setLoading] = useState(true);
+    const [editingSchedule, setEditingSchedule] = useState<any>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [dailyProgress, setDailyProgress] = useState<any[]>([]);
     const [stats, setStats] = useState({
         active: 0,
@@ -89,6 +94,34 @@ export default function SchedulePage() {
 
     const handleScheduleCreated = () => {
         fetchData();
+        setEditingSchedule(null);
+    };
+
+    const handleEdit = (schedule: any) => {
+        setEditingSchedule(schedule);
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = async (scheduleId: string) => {
+        if (!confirm('Haqiqatan ham bu rejani o\'chirmoqchimisiz?')) {
+            return;
+        }
+
+        setDeletingId(scheduleId);
+        const result = await deleteSchedule(scheduleId);
+        setDeletingId(null);
+
+        if (result.success) {
+            toast.success('Reja muvaffaqiyatli o\'chirildi');
+            fetchData();
+        } else {
+            toast.error(result.error || 'Xatolik yuz berdi');
+        }
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setEditingSchedule(null);
     };
 
     if (loading) {
@@ -215,6 +248,25 @@ export default function SchedulePage() {
                                                 </div>
                                             </div>
                                         </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                                            <button
+                                                onClick={() => handleEdit(schedule)}
+                                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg transition-colors"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                                Tahrirlash
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(schedule.id)}
+                                                disabled={deletingId === schedule.id}
+                                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors disabled:opacity-50"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                {deletingId === schedule.id ? 'O\'chirilmoqda...' : 'O\'chirish'}
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -245,9 +297,10 @@ export default function SchedulePage() {
             {/* Modal */}
             <ScheduleBookModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={handleModalClose}
                 onScheduleCreated={handleScheduleCreated}
                 selectedDate={selectedDate}
+                editingSchedule={editingSchedule}
             />
         </ProtectedRoute>
     );
