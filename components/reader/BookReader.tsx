@@ -158,7 +158,7 @@ export function BookReader({ fileUrl, bookTitle, bookId, onClose }: BookReaderPr
                     });
                 }
 
-                await supabase
+                const { data: dailyData, error: dailyError } = await supabase
                     .from('daily_progress')
                     .upsert({
                         schedule_id: activeSchedule.id,
@@ -168,6 +168,17 @@ export function BookReader({ fileUrl, bookTitle, bookId, onClose }: BookReaderPr
                     }, {
                         onConflict: 'schedule_id,date'
                     });
+
+                if (dailyError) {
+                    console.error('❌ Error saving daily progress:', dailyError);
+                } else {
+                    console.log('✅ Daily progress saved:', {
+                        schedule_id: activeSchedule.id,
+                        date: today,
+                        pages_read: totalDailyPages,
+                        completed: isNowCompleted
+                    });
+                }
 
                 // Show celebration if goal was just completed
                 if (!wasCompleted && isNowCompleted) {

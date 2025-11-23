@@ -86,7 +86,14 @@ export default function DashboardPage() {
                     .limit(1),
                 supabase
                     .from('daily_progress')
-                    .select('pages_read, minutes_read, date, schedule_id')
+                    .select(`
+                        pages_read, 
+                        minutes_read, 
+                        date, 
+                        schedule_id,
+                        reading_schedule!inner(user_id)
+                    `)
+                    .eq('reading_schedule.user_id', user?.id)
                     .gte('date', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]),
                 supabase
                     .from('user_progress')
@@ -158,7 +165,18 @@ export default function DashboardPage() {
                 const activeScheduleId = schedulesData[0].id;
                 const now = new Date();
                 const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+                console.log('Looking for today progress:', {
+                    todayStr,
+                    activeScheduleId,
+                    weeklyDataLength: weeklyData?.length,
+                    weeklyData: weeklyData
+                });
+
                 const todayData = weeklyData?.find((p: any) => p.date === todayStr && p.schedule_id === activeScheduleId);
+
+                console.log('Found today progress:', todayData);
+
                 setTodayProgress(todayData || null);
             } else {
                 setSchedules([]);
