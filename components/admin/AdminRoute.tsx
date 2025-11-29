@@ -3,16 +3,14 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Permission } from '@/lib/permissions';
 
 interface AdminRouteProps {
     children: React.ReactNode;
-    requiredPermission?: Permission;
     requireSuperAdmin?: boolean;
 }
 
-export function AdminRoute({ children, requiredPermission, requireSuperAdmin }: AdminRouteProps) {
-    const { user, isLoading, isAdmin, isSuperAdmin, hasPermission } = useAuth();
+export function AdminRoute({ children, requireSuperAdmin }: AdminRouteProps) {
+    const { user, isLoading, isAdmin, isSuperAdmin } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -29,19 +27,13 @@ export function AdminRoute({ children, requiredPermission, requireSuperAdmin }: 
                 return;
             }
 
-            // Require specific permission
-            if (requiredPermission && !hasPermission(requiredPermission)) {
-                router.push('/dashboard');
-                return;
-            }
-
             // Require any admin role
-            if (!requireSuperAdmin && !requiredPermission && !isAdmin()) {
+            if (!requireSuperAdmin && !isAdmin()) {
                 router.push('/dashboard');
                 return;
             }
         }
-    }, [user, isLoading, router, requireSuperAdmin, requiredPermission, isAdmin, isSuperAdmin, hasPermission]);
+    }, [user, isLoading, router, requireSuperAdmin, isAdmin, isSuperAdmin]);
 
     if (isLoading) {
         return (
@@ -57,8 +49,7 @@ export function AdminRoute({ children, requiredPermission, requireSuperAdmin }: 
     // Check permissions
     if (!user) return null;
     if (requireSuperAdmin && !isSuperAdmin()) return null;
-    if (requiredPermission && !hasPermission(requiredPermission)) return null;
-    if (!requireSuperAdmin && !requiredPermission && !isAdmin()) return null;
+    if (!requireSuperAdmin && !isAdmin()) return null;
 
     return <>{children}</>;
 }
