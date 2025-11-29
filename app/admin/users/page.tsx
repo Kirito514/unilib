@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { UsersTable } from '@/components/admin/UsersTable';
 import { Users } from 'lucide-react';
 

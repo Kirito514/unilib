@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { BookDetailClient } from '@/components/library/BookDetailClient';

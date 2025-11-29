@@ -3,14 +3,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { UserRole, hasPermission, Permission, isAdmin } from '@/lib/permissions';
+import { Role, hasPermission, ROLES } from '@/lib/permissions';
 
 interface User {
     id: string;
     name: string;
     email: string;
     university?: string;
-    role: UserRole;
+    role: Role;
 }
 
 interface AuthContextType {
@@ -19,7 +19,7 @@ interface AuthContextType {
     register: (name: string, email: string, password: string, university?: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
     isLoading: boolean;
-    hasPermission: (permission: Permission) => boolean;
+    hasPermission: (permission: Role) => boolean;
     isAdmin: () => boolean;
     isSuperAdmin: () => boolean;
 }
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: supabaseUser.email!,
             name: profile?.name || supabaseUser.email!.split('@')[0],
             university: profile?.university,
-            role: (profile?.role as UserRole) || 'USER'
+            role: (profile?.role as Role) || ROLES.STUDENT
         });
     };
 
@@ -141,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     email: data.user.email!,
                     name: name,
                     university: university,
-                    role: 'USER'
+                    role: ROLES.STUDENT
                 });
                 return { success: true };
             }
@@ -169,19 +169,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         window.location.href = '/login';
     };
 
-    const checkPermission = (permission: Permission): boolean => {
+    const checkPermission = (requiredRole: Role): boolean => {
         if (!user) return false;
-        return hasPermission(user.role, permission);
+        return hasPermission(user.role, requiredRole);
     };
 
     const checkIsAdmin = (): boolean => {
         if (!user) return false;
-        return isAdmin(user.role);
+        return ([ROLES.SUPER_ADMIN, ROLES.SYSTEM_ADMIN, ROLES.ORG_ADMIN] as string[]).includes(user.role);
     };
 
     const checkIsSuperAdmin = (): boolean => {
         if (!user) return false;
-        return user.role === 'SUPER_ADMIN';
+        return user.role === ROLES.SUPER_ADMIN;
     };
 
     return (

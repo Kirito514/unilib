@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from '@/contexts/AuthContext';
-import { getRoleDisplayName, getRoleColor } from '@/lib/permissions';
+import { getRoleDisplayName, getRoleBadgeColor } from '@/lib/permissions';
 import { Bell, LogOut, Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -47,8 +47,8 @@ export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
                     <div className="flex items-center gap-3 pl-2 md:pl-4 border-l border-border">
                         <div className="text-right hidden sm:block">
                             <p className="text-sm font-medium">{user.name}</p>
-                            <div className="flex items-center gap-2">
-                                <span className={`text-xs px-2 py-0.5 rounded-full text-white ${getRoleColor(user.role)}`}>
+                            <div className="flex items-center gap-2 justify-end">
+                                <span className={`text-xs px-2 py-0.5 rounded-full ${getRoleBadgeColor(user.role)}`}>
                                     {getRoleDisplayName(user.role)}
                                 </span>
                             </div>

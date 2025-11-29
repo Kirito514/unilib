@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { BooksTable } from '@/components/admin/BooksTable';
 import { BookOpen, Plus } from 'lucide-react';
 import Link from 'next/link';

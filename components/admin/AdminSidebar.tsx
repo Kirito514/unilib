@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ROLES } from '@/lib/permissions';
 import {
     LayoutDashboard,
     BookOpen,
@@ -10,6 +11,7 @@ import {
     MessageSquare,
     BarChart3,
     Settings,
+    Building2,
     ChevronRight,
     X
 } from 'lucide-react';
@@ -25,6 +27,12 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
     const navItems = [
         {
+            href: '/super-admin',
+            label: 'Super Admin',
+            icon: Building2,
+            show: isSuperAdmin()
+        },
+        {
             href: '/admin',
             label: 'Dashboard',
             icon: LayoutDashboard,
@@ -34,31 +42,31 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             href: '/admin/books',
             label: 'Kitoblar',
             icon: BookOpen,
-            show: hasPermission('books:read')
+            show: hasPermission(ROLES.LIBRARIAN)
         },
         {
             href: '/admin/users',
             label: 'Foydalanuvchilar',
             icon: Users,
-            show: isSuperAdmin()
+            show: hasPermission(ROLES.HEAD_LIBRARIAN)
         },
         {
             href: '/admin/groups',
             label: 'Guruhlar',
             icon: MessageSquare,
-            show: hasPermission('groups:moderate')
+            show: hasPermission(ROLES.TEACHER)
         },
         {
             href: '/admin/analytics',
             label: 'Statistika',
             icon: BarChart3,
-            show: hasPermission('analytics:view')
+            show: hasPermission(ROLES.TEACHER)
         },
         {
             href: '/admin/settings',
             label: 'Sozlamalar',
             icon: Settings,
-            show: hasPermission('settings:manage')
+            show: hasPermission(ROLES.ORG_ADMIN)
         },
     ].filter(item => item.show);
 

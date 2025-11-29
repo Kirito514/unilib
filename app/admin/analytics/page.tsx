@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
 import { BarChart3 } from 'lucide-react';
 

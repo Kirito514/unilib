@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { GroupsTable } from '@/components/admin/GroupsTable';
 import { MessageSquare } from 'lucide-react';
 

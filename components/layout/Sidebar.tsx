@@ -14,7 +14,8 @@ import {
     ChevronRight,
     Shield,
     Calendar,
-    Trophy
+    Trophy,
+    Building2
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -92,11 +93,27 @@ export function Sidebar() {
                         );
                     })}
 
+                    {/* Super Admin Panel - Only for super admins */}
+                    {user?.role === 'super_admin' && (
+                        <Link
+                            href="/super-admin"
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group mt-2 border-t border-border pt-4 ${pathname.startsWith('/super-admin')
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                } ${isCollapsed ? 'justify-center px-2' : ''}`}
+                            title={isCollapsed ? 'Super Admin' : ''}
+                        >
+                            <Building2 className="w-5 h-5 flex-shrink-0" />
+                            {!isCollapsed && <span className="font-medium">Super Admin</span>}
+                            {pathname.startsWith('/super-admin') && !isCollapsed && <ChevronRight className="w-4 h-4 ml-auto" />}
+                        </Link>
+                    )}
+
                     {/* Admin Panel - Only for admins */}
                     {isAdmin() && (
                         <Link
                             href="/admin"
-                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group mt-2 border-t border-border pt-4 ${pathname.startsWith('/admin')
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group mt-2 ${!user?.role?.includes('super_admin') ? 'border-t border-border pt-4' : ''} ${pathname.startsWith('/admin')
                                 ? 'bg-primary text-primary-foreground shadow-sm'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                                 } ${isCollapsed ? 'justify-center px-2' : ''}`}

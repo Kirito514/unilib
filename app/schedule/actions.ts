@@ -1,6 +1,6 @@
 'use server';
 
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 export async function updateSchedule(

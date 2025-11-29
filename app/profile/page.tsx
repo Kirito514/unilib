@@ -59,7 +59,10 @@ export default function ProfilePage() {
                 setEditedProfile(data);
             }
         } catch (error) {
-            console.error('Error fetching profile:', error);
+            console.error('Error fetching profile:', JSON.stringify(error, null, 2));
+            if (error) {
+                console.error('Error details:', error);
+            }
         } finally {
             setIsLoading(false);
         }

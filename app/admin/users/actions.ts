@@ -1,6 +1,6 @@
 'use server';
 
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { UserRole } from '@/lib/permissions';
 import { revalidatePath } from 'next/cache';
 

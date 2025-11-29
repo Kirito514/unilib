@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { BookCard } from '@/components/library/BookCard';
 import { LibraryFilters } from '@/components/library/LibraryFilters';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 
 export const revalidate = 60; // Cache for 60 seconds
