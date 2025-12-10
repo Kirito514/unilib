@@ -228,7 +228,19 @@ export default function ProfilePage() {
                                 <div className="flex flex-col sm:flex-row items-start gap-6">
                                     {/* Avatar */}
                                     <div className="relative group mx-auto sm:mx-0">
-                                        <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-primary/80 to-accent flex items-center justify-center text-3xl md:text-4xl font-bold text-white shadow-lg ring-4 ring-primary/20">
+                                        {profile.avatar_url ? (
+                                            <img
+                                                src={profile.avatar_url}
+                                                alt={profile.name}
+                                                className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover shadow-lg ring-4 ring-primary/20"
+                                                onError={(e) => {
+                                                    // Fallback to initials if image fails to load
+                                                    e.currentTarget.style.display = 'none';
+                                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                                }}
+                                            />
+                                        ) : null}
+                                        <div className={`w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-primary/80 to-accent flex items-center justify-center text-3xl md:text-4xl font-bold text-white shadow-lg ring-4 ring-primary/20 ${profile.avatar_url ? 'hidden' : ''}`}>
                                             {profile.name.charAt(0).toUpperCase()}
                                         </div>
                                         {isEditing && (
@@ -394,7 +406,7 @@ export default function ProfilePage() {
                         {/* Right Column - Stats */}
                         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
                             {/* QR Code Card */}
-                            {profile.student_id && qrCodeUrl && (
+                            {(profile.student_number || profile.student_id) && qrCodeUrl && (
                                 <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/5 border border-blue-500/20 rounded-2xl p-6 shadow-xl">
                                     <h3 className="font-bold mb-4 text-base">Talaba ID</h3>
 

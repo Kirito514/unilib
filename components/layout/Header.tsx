@@ -164,10 +164,23 @@ export function Header() {
                         <div className="hidden md:block relative" data-user-menu>
                             <button
                                 onClick={toggleUserMenu}
-                                className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-sm text-white hover:scale-105 transition-transform shadow-md"
+                                className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-sm text-white hover:scale-105 transition-transform shadow-md overflow-hidden"
                                 aria-label="User menu"
                             >
-                                {user.name.charAt(0).toUpperCase()}
+                                {user.avatar_url ? (
+                                    <img
+                                        src={user.avatar_url}
+                                        alt={user.name}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                        }}
+                                    />
+                                ) : null}
+                                <span className={user.avatar_url ? 'hidden' : ''}>
+                                    {user.name.charAt(0).toUpperCase()}
+                                </span>
                             </button>
                             {menuState.user && (
                                 <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-border bg-card shadow-lg z-[70] p-2 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -254,9 +267,27 @@ export function Header() {
                     {/* User Menu Items */}
                     {user ? (
                         <div className="pt-2 border-t border-border space-y-2 mt-3">
-                            <div className="px-4 py-2">
-                                <p className="font-semibold text-base">{user.name}</p>
-                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                            <div className="px-4 py-2 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-sm text-white shadow-md overflow-hidden flex-shrink-0">
+                                    {user.avatar_url ? (
+                                        <img
+                                            src={user.avatar_url}
+                                            alt={user.name}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                            }}
+                                        />
+                                    ) : null}
+                                    <span className={user.avatar_url ? 'hidden' : ''}>
+                                        {user.name.charAt(0).toUpperCase()}
+                                    </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-base truncate">{user.name}</p>
+                                    <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+                                </div>
                             </div>
 
                             {isAdmin() && (

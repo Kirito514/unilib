@@ -12,6 +12,7 @@ interface User {
     email: string;
     university?: string;
     role: Role;
+    avatar_url?: string;
 }
 
 interface AuthContextType {
@@ -92,16 +93,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Get user profile from profiles table
         const { data: profile } = await supabase
             .from('profiles')
-            .select('name, university, role')
+            .select('name, university, role, avatar_url')
             .eq('id', supabaseUser.id)
             .single();
 
         setUser({
             id: supabaseUser.id,
-            email: supabaseUser.email!,
-            name: profile?.name || supabaseUser.email!.split('@')[0],
+            email: supabaseUser.email || '',
+            name: profile?.name || supabaseUser.user_metadata?.name || 'User',
             university: profile?.university,
-            role: (profile?.role as Role) || ROLES.STUDENT
+            role: (profile?.role as Role) || 'student',
+            avatar_url: profile?.avatar_url,
         });
     };
 
