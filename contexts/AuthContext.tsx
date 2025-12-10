@@ -166,13 +166,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
+            // Sign out from Supabase
             await supabase.auth.signOut();
+
+            // Clear all local storage
+            if (typeof window !== 'undefined') {
+                localStorage.clear();
+                sessionStorage.clear();
+            }
         } catch (error) {
             console.error('Error signing out:', error);
         } finally {
             setUser(null);
-            router.push('/login');
-            router.refresh();
+
+            // Force full page reload to clear all state
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+            } else {
+                router.push('/login');
+                router.refresh();
+            }
         }
     };
 

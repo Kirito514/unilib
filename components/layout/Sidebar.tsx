@@ -14,8 +14,8 @@ import {
     Shield,
     Calendar,
     Trophy,
-
-    User
+    User,
+    Settings
 } from 'lucide-react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
@@ -63,6 +63,7 @@ export function Sidebar() {
         { href: '/achievements', label: 'Yutuqlar', icon: Trophy },
         { href: '/leaderboard', label: 'Reyting', icon: Award },
         { href: '/citations', label: 'Iqtiboslar', icon: Quote },
+        { href: '/settings', label: 'Sozlamalar', icon: Settings },
     ], []);
 
     return (

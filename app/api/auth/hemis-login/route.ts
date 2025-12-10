@@ -156,6 +156,15 @@ export async function POST(request: NextRequest) {
                 university: student.university || 'UMFT',
                 role: 'student',
                 avatar_url: student.image || student.picture || null,
+                hemis_token: hemisToken, // Save token for future API calls
+                // Additional HEMIS details
+                phone: student.phone || null,
+                faculty: student.faculty?.name || null,
+                student_group: student.group?.name || null,
+                course: student.level?.name || null,
+                education_form: student.educationForm?.name || null,
+                specialty: student.specialty?.name || null,
+                gpa: student.avg_gpa || null,
             });
 
         if (profileError) {
