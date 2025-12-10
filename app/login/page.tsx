@@ -16,6 +16,9 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [emailFocused, setEmailFocused] = useState(false);
     const [passwordFocused, setPasswordFocused] = useState(false);
+    const [useHemisLogin, setUseHemisLogin] = useState(false);
+    const [hemisLogin, setHemisLogin] = useState('');
+    const [hemisPassword, setHemisPassword] = useState('');
     const { login, user, isLoading: authLoading } = useAuth();
     const router = useRouter();
 
@@ -26,7 +29,7 @@ export default function LoginPage() {
         }
     }, [user, authLoading, router]);
 
-    // ✅ Memoized submit handler
+    // Email/Password login handler
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -38,12 +41,10 @@ export default function LoginPage() {
                 setError(result.error || 'Email yoki parol noto\'g\'ri');
                 setIsLoading(false);
             } else {
-                // ✅ Success feedback
                 toast.success('Muvaffaqiyatli!', {
                     description: 'Tizimga kirildi. Dashboard\'ga yo\'naltirilmoqda...',
                     icon: <CheckCircle className="w-5 h-5" />
                 });
-                // Don't set isLoading to false - useEffect will redirect
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
@@ -51,7 +52,96 @@ export default function LoginPage() {
         }
     }, [email, password, login]);
 
-    // ✅ Memoized toggle handler
+    // HEMIS login handler
+    const handleHemisLogin = useCallback(async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('/api/auth/hemis-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login: hemisLogin, password: hemisPassword }),
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                setError(data.error || 'HEMIS login xatosi');
+                setIsLoading(false);
+            } else {
+                // Use returned credentials to login via Supabase
+                if (data.data.email && data.data.password) {
+                    const loginResult = await login(data.data.email, data.data.password);
+                    if (!loginResult.success) {
+                        setError('Login xatosi');
+                        setIsLoading(false);
+                    } else {
+                        toast.success('Muvaffaqiyatli!', {
+                            description: 'HEMIS orqali kirildi. Dashboard\'ga yo\'naltirilmoqda...',
+                            icon: <CheckCircle className="w-5 h-5" />
+                        });
+
+                        // Background sync (non-blocking)
+                        if (user?.id) {
+                            fetch('/api/hemis/background-sync', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ userId: user.id }),
+                            }).catch(err => console.log('Background sync failed:', err));
+                        }
+                    }
+                } else {
+                    toast.success('Muvaffaqiyatli!', {
+                        description: 'HEMIS orqali kirildi. Dashboard\'ga yo\'naltirilmoqda...',
+                        icon: <CheckCircle className="w-5 h-5" />
+                    });
+                }
+            }
+        } catch (err) {
+            setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+            setIsLoading(false);
+        }
+    }, [hemisLogin, hemisPassword, login]);
+
+    // Direct database login (bypass HEMIS for existing users)
+    const handleDbLogin = useCallback(async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('/api/auth/db-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login: hemisLogin }),
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                setError(data.error || 'Foydalanuvchi topilmadi');
+                setIsLoading(false);
+            } else {
+                // Login with database credentials
+                const loginResult = await login(data.data.email, data.data.password);
+                if (!loginResult.success) {
+                    setError('Login xatosi');
+                    setIsLoading(false);
+                } else {
+                    toast.success('Muvaffaqiyatli!', {
+                        description: 'Bazadagi ma\'lumotlar bilan kirildi',
+                        icon: <CheckCircle className="w-5 h-5" />
+                    });
+                }
+            }
+        } catch (err) {
+            setError('Xatolik yuz berdi');
+            setIsLoading(false);
+        }
+    }, [hemisLogin, login]);
+
     const togglePasswordVisibility = useCallback(() => {
         setShowPassword(prev => !prev);
     }, []);
@@ -66,7 +156,6 @@ export default function LoginPage() {
             <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 blur-[100px] rounded-full pointer-events-none animate-pulse-slow" />
 
             <div className="w-full max-w-md relative z-10">
-
                 {/* Card */}
                 <div className="bg-card border border-border rounded-2xl shadow-xl p-8 backdrop-blur-sm">
                     <div className="text-center mb-8">
@@ -75,7 +164,9 @@ export default function LoginPage() {
                             <span>Xush kelibsiz</span>
                         </div>
                         <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Tizimga kirish</h1>
-                        <p className="text-muted-foreground">Hisobingizga kiring va o'qishni davom ettiring</p>
+                        <p className="text-muted-foreground">
+                            {useHemisLogin ? 'HEMIS login va parolingizni kiriting' : 'Hisobingizga kiring va o\'qishni davom ettiring'}
+                        </p>
                     </div>
 
                     {error && (
@@ -85,45 +176,43 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={useHemisLogin ? handleHemisLogin : handleSubmit} className="space-y-5">
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                                Email
+                            <label htmlFor="login-input" className="block text-sm font-medium text-foreground mb-2">
+                                {useHemisLogin ? 'HEMIS Login' : 'Email'}
                             </label>
                             <div className="relative">
-                                <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${emailFocused ? 'text-primary' : 'text-muted-foreground'
+                                <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${(useHemisLogin ? hemisLogin : emailFocused) ? 'text-primary' : 'text-muted-foreground'
                                     }`} />
                                 <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    onFocus={() => setEmailFocused(true)}
-                                    onBlur={() => setEmailFocused(false)}
+                                    id="login-input"
+                                    type={useHemisLogin ? 'text' : 'email'}
+                                    value={useHemisLogin ? hemisLogin : email}
+                                    onChange={(e) => useHemisLogin ? setHemisLogin(e.target.value) : setEmail(e.target.value)}
+                                    onFocus={() => !useHemisLogin && setEmailFocused(true)}
+                                    onBlur={() => !useHemisLogin && setEmailFocused(false)}
                                     required
-                                    aria-label="Email manzil"
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground placeholder:text-muted-foreground"
-                                    placeholder="sizning@email.uz"
+                                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground"
+                                    placeholder={useHemisLogin ? 'HEMIS login' : 'email@example.com'}
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                            <label htmlFor="password-input" className="block text-sm font-medium text-foreground mb-2">
                                 Parol
                             </label>
                             <div className="relative">
-                                <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${passwordFocused ? 'text-primary' : 'text-muted-foreground'
+                                <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${(useHemisLogin ? hemisPassword : passwordFocused) ? 'text-primary' : 'text-muted-foreground'
                                     }`} />
                                 <input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    onFocus={() => setPasswordFocused(true)}
-                                    onBlur={() => setPasswordFocused(false)}
+                                    id="password-input"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={useHemisLogin ? hemisPassword : password}
+                                    onChange={(e) => useHemisLogin ? setHemisPassword(e.target.value) : setPassword(e.target.value)}
+                                    onFocus={() => !useHemisLogin && setPasswordFocused(true)}
+                                    onBlur={() => !useHemisLogin && setPasswordFocused(false)}
                                     required
-                                    aria-label="Parol"
                                     className="w-full pl-11 pr-11 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground"
                                     placeholder="••••••••"
                                 />
@@ -131,27 +220,28 @@ export default function LoginPage() {
                                     type="button"
                                     onClick={togglePasswordVisibility}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                                    aria-label={showPassword ? "Parolni yashirish" : "Parolni ko'rsatish"}
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                />
-                                <span className="text-sm text-muted-foreground">Eslab qolish</span>
-                            </label>
-                            <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                                Parolni unutdingizmi?
-                            </Link>
-                        </div>
+                        {!useHemisLogin && (
+                            <div className="flex items-center justify-between">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                        className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
+                                    />
+                                    <span className="text-sm text-muted-foreground">Eslab qolish</span>
+                                </label>
+                                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                                    Parolni unutdingizmi?
+                                </Link>
+                            </div>
+                        )}
 
                         <button
                             type="submit"
@@ -171,6 +261,25 @@ export default function LoginPage() {
                             )}
                         </button>
                     </form>
+
+                    {/* Divider */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-4 bg-card text-muted-foreground">yoki</span>
+                        </div>
+                    </div>
+
+                    {/* Toggle Button */}
+                    <button
+                        type="button"
+                        onClick={() => setUseHemisLogin(!useHemisLogin)}
+                        className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-base shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3"
+                    >
+                        {useHemisLogin ? 'Email bilan kirish' : 'HEMIS orqali kirish'}
+                    </button>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-muted-foreground">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useProfileData } from '@/lib/react-query/hooks';
@@ -15,20 +16,28 @@ import {
     Edit2,
     Save,
     X,
-    Camera
+    Camera,
+    Phone,
+    GraduationCap,
+    Users,
+    BookMarked
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { ProfileSkeleton } from '@/components/loading/ProfileSkeleton';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
+// Lazy load heavy components
+const StudentIDCard = dynamic(() => import('@/components/profile/StudentIDCard'), {
+    loading: () => <div className="bg-card/80 rounded-2xl p-6 h-64 animate-pulse" />,
+    ssr: false
+});
+
 export default function ProfilePage() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [qrCodeUrl, setQrCodeUrl] = useState('');
-    const [barcodeUrl, setBarcodeUrl] = useState('');
 
     // ✅ Use React Query hook with automatic caching
     const { data, isLoading, error } = useProfileData(user?.id);
@@ -39,59 +48,8 @@ export default function ProfilePage() {
         bio: ''
     });
 
-    // ✅ Memoize QR code and Barcode generation
-    useEffect(() => {
-        const generateCodes = async () => {
-            // Use student_number if available, fallback to student_id
-            const studentId = data?.profile?.student_number || data?.profile?.student_id;
-            if (!studentId) return;
-
-            // QR Code
-            const qrCacheKey = `qr-${studentId}`;
-            const qrCached = localStorage.getItem(qrCacheKey);
-
-            if (qrCached) {
-                setQrCodeUrl(qrCached);
-            } else {
-                const QRCode = (await import('qrcode')).default;
-                const qrText = `STUDENT-UNI-${studentId}`;
-                const qrDataUrl = await QRCode.toDataURL(qrText, {
-                    width: 200,
-                    margin: 2,
-                    color: {
-                        dark: '#000000',
-                        light: '#FFFFFF'
-                    }
-                });
-                setQrCodeUrl(qrDataUrl);
-                localStorage.setItem(qrCacheKey, qrDataUrl);
-            }
-
-            // Barcode
-            const barcodeCacheKey = `barcode-${studentId}`;
-            const barcodeCached = localStorage.getItem(barcodeCacheKey);
-
-            if (barcodeCached) {
-                setBarcodeUrl(barcodeCached);
-            } else {
-                const JsBarcode = (await import('jsbarcode')).default;
-                const canvas = document.createElement('canvas');
-                JsBarcode(canvas, studentId, {
-                    format: 'CODE128',
-                    width: 2,
-                    height: 80,
-                    displayValue: true,
-                    fontSize: 14,
-                    margin: 10
-                });
-                const barcodeDataUrl = canvas.toDataURL();
-                setBarcodeUrl(barcodeDataUrl);
-                localStorage.setItem(barcodeCacheKey, barcodeDataUrl);
-            }
-        };
-
-        generateCodes();
-    }, [data?.profile?.student_number, data?.profile?.student_id]);
+    // ✅ Simplified - no heavy QR/Barcode generation on page load
+    // QR/Barcode will be shown only when needed
 
     // Update edited profile when data loads
     useEffect(() => {
@@ -228,7 +186,19 @@ export default function ProfilePage() {
                                 <div className="flex flex-col sm:flex-row items-start gap-6">
                                     {/* Avatar */}
                                     <div className="relative group mx-auto sm:mx-0">
-                                        <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-primary/80 to-accent flex items-center justify-center text-3xl md:text-4xl font-bold text-white shadow-lg ring-4 ring-primary/20">
+                                        {profile.avatar_url ? (
+                                            <img
+                                                src={profile.avatar_url}
+                                                alt={profile.name}
+                                                className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover shadow-lg ring-4 ring-primary/20"
+                                                onError={(e) => {
+                                                    // Fallback to initials if image fails to load
+                                                    e.currentTarget.style.display = 'none';
+                                                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                                }}
+                                            />
+                                        ) : null}
+                                        <div className={`w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary via-primary/80 to-accent flex items-center justify-center text-3xl md:text-4xl font-bold text-white shadow-lg ring-4 ring-primary/20 ${profile.avatar_url ? 'hidden' : ''}`}>
                                             {profile.name.charAt(0).toUpperCase()}
                                         </div>
                                         {isEditing && (
@@ -389,44 +359,99 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Academic Info (HEMIS Data) */}
+                            {(profile.faculty || profile.student_group || profile.course) && (
+                                <div className="bg-card/80 backdrop-blur-xl border border-border/40 rounded-2xl p-6 shadow-xl">
+                                    <h3 className="font-bold mb-4 text-base">Akademik Ma'lumotlar</h3>
+                                    <div className="space-y-3">
+                                        {profile.phone && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <Phone className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Telefon</p>
+                                                    <p className="text-sm text-muted-foreground">{profile.phone}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profile.faculty && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <Building2 className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Fakultet</p>
+                                                    <p className="text-sm text-muted-foreground">{profile.faculty}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profile.student_group && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <Users className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Guruh</p>
+                                                    <p className="text-sm text-muted-foreground">{profile.student_group}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profile.course && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <GraduationCap className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Kurs</p>
+                                                    <p className="text-sm text-muted-foreground">{profile.course}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profile.education_form && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <BookOpen className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Ta'lim shakli</p>
+                                                    <p className="text-sm text-muted-foreground">{profile.education_form}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profile.specialty && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <BookMarked className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">Mutaxassislik</p>
+                                                    <p className="text-sm text-muted-foreground">{profile.specialty}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {profile.gpa && (
+                                            <div className="flex items-center gap-3 py-2">
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <Award className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">GPA</p>
+                                                    <p className="text-sm text-muted-foreground font-semibold">{profile.gpa}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Right Column - Stats */}
                         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-                            {/* QR Code Card */}
-                            {profile.student_id && qrCodeUrl && (
-                                <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/5 border border-blue-500/20 rounded-2xl p-6 shadow-xl">
-                                    <h3 className="font-bold mb-4 text-base">Talaba ID</h3>
-
-                                    {/* QR Code */}
-                                    <div className="bg-white p-4 rounded-xl flex items-center justify-center mb-4 shadow-md">
-                                        <img
-                                            src={qrCodeUrl}
-                                            alt="Student QR Code"
-                                            className="w-48 h-48"
-                                        />
-                                    </div>
-
-                                    {/* Barcode */}
-                                    {barcodeUrl && (
-                                        <div className="bg-white p-4 rounded-xl flex items-center justify-center mb-4 shadow-md">
-                                            <img
-                                                src={barcodeUrl}
-                                                alt="Student Barcode"
-                                                className="max-w-full h-auto"
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div className="mt-3 text-center space-y-1">
-                                        <p className="text-xs font-mono text-muted-foreground font-semibold">
-                                            ID: {profile.student_number || profile.student_id}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Kutubxonachiga ko'rsating
-                                        </p>
-                                    </div>
-                                </div>
+                            {/* Student ID Card with QR/Barcode - Lazy Loaded */}
+                            {(profile.student_number || profile.student_id) && (
+                                <StudentIDCard studentNumber={profile.student_number || profile.student_id} />
                             )}
 
                             {/* XP Card */}
