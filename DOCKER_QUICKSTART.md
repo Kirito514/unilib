@@ -5,9 +5,9 @@
 ### 1. Environment Sozlash
 ```bash
 # Template nusxalash
-copy env.production.template .env.production
+copy env.docker-template .env
 
-# .env.production ni tahrirlash va Supabase ma'lumotlarini kiriting
+# .env ni tahrirlash va Supabase ma'lumotlarini kiriting
 ```
 
 ### 2. Docker Build
