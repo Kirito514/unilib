@@ -65,20 +65,17 @@ export default function SettingsPage() {
         const toastId = toast.loading('Akkount o\'chirilmoqda...');
 
         try {
-            // Delete profile first
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .delete()
-                .eq('id', user.id);
+            // Call API endpoint to delete account
+            const response = await fetch('/api/auth/delete-account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id }),
+            });
 
-            if (profileError) throw profileError;
+            const data = await response.json();
 
-            // Delete auth user
-            const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
-
-            if (authError) {
-                // If admin delete fails, try regular signOut
-                await supabase.auth.signOut();
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to delete account');
             }
 
             toast.success('Akkount o\'chirildi', {
@@ -86,14 +83,15 @@ export default function SettingsPage() {
                 description: 'Xayr!'
             });
 
-            // Logout and redirect
+            // Sign out and redirect
+            await supabase.auth.signOut();
+
             setTimeout(() => {
-                logout();
+                window.location.href = '/login';
             }, 1000);
         } catch (error: any) {
             console.error('Delete error:', error);
             toast.error(error.message || 'Xatolik yuz berdi', { id: toastId });
-        } finally {
             setIsDeleting(false);
         }
     };

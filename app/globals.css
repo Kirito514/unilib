@@ -179,6 +179,12 @@
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
 }
 
+/* Optimized Background Pattern */
+.bg-dot-pattern {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
 /* Custom Toast Celebration Styles */
 /* Custom Toast Styles */
 [data-sonner-toast] {

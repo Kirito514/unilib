@@ -14,8 +14,6 @@ export default function LoginPage() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [emailFocused, setEmailFocused] = useState(false);
-    const [passwordFocused, setPasswordFocused] = useState(false);
     const [useHemisLogin, setUseHemisLogin] = useState(false);
     const [hemisLogin, setHemisLogin] = useState('');
     const [hemisPassword, setHemisPassword] = useState('');
@@ -148,12 +146,10 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12 relative overflow-hidden">
-            {/* Background decorations */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.15] text-primary"
-                style={{ backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)', backgroundSize: '32px 32px' }}>
-            </div>
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 blur-[100px] rounded-full pointer-events-none animate-pulse-slow" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 blur-[100px] rounded-full pointer-events-none animate-pulse-slow" />
+            {/* Optimized background decorations */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.08] bg-dot-pattern" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 blur-3xl rounded-full pointer-events-none" />
 
             <div className="w-full max-w-md relative z-10">
                 {/* Card */}
@@ -182,15 +178,12 @@ export default function LoginPage() {
                                 {useHemisLogin ? 'HEMIS Login' : 'Email'}
                             </label>
                             <div className="relative">
-                                <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${(useHemisLogin ? hemisLogin : emailFocused) ? 'text-primary' : 'text-muted-foreground'
-                                    }`} />
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                                 <input
                                     id="login-input"
                                     type={useHemisLogin ? 'text' : 'email'}
                                     value={useHemisLogin ? hemisLogin : email}
                                     onChange={(e) => useHemisLogin ? setHemisLogin(e.target.value) : setEmail(e.target.value)}
-                                    onFocus={() => !useHemisLogin && setEmailFocused(true)}
-                                    onBlur={() => !useHemisLogin && setEmailFocused(false)}
                                     required
                                     className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground"
                                     placeholder={useHemisLogin ? 'HEMIS login' : 'email@example.com'}
@@ -203,15 +196,12 @@ export default function LoginPage() {
                                 Parol
                             </label>
                             <div className="relative">
-                                <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${(useHemisLogin ? hemisPassword : passwordFocused) ? 'text-primary' : 'text-muted-foreground'
-                                    }`} />
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                                 <input
                                     id="password-input"
                                     type={showPassword ? 'text' : 'password'}
                                     value={useHemisLogin ? hemisPassword : password}
                                     onChange={(e) => useHemisLogin ? setHemisPassword(e.target.value) : setPassword(e.target.value)}
-                                    onFocus={() => !useHemisLogin && setPasswordFocused(true)}
-                                    onBlur={() => !useHemisLogin && setPasswordFocused(false)}
                                     required
                                     className="w-full pl-11 pr-11 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground"
                                     placeholder="••••••••"
