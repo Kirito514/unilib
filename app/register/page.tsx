@@ -144,12 +144,10 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12 relative overflow-hidden">
-            {/* Background decorations */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.15] text-primary"
-                style={{ backgroundImage: 'radial-gradient(currentColor 1px, transparent 1px)', backgroundSize: '32px 32px' }}>
-            </div>
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 blur-[100px] rounded-full pointer-events-none animate-pulse-slow" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 blur-[100px] rounded-full pointer-events-none animate-pulse-slow" />
+            {/* Optimized background decorations */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.08] bg-dot-pattern" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 blur-3xl rounded-full pointer-events-none" />
 
             <div className="w-full max-w-md relative z-10">
 

@@ -77,34 +77,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             if (session?.user) {
+                // Set loading false immediately to show UI faster
+                setIsLoading(false);
                 await setUserFromSupabase(session.user);
+            } else {
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error checking user:', error);
             // Clear any invalid session
             await supabase.auth.signOut();
             setUser(null);
-        } finally {
             setIsLoading(false);
         }
     };
 
     const setUserFromSupabase = async (supabaseUser: SupabaseUser) => {
-        // Get user profile from profiles table
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('name, university, role, avatar_url')
-            .eq('id', supabaseUser.id)
-            .single();
+        try {
+            // Get user profile from profiles table
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('name, university, role, avatar_url')
+                .eq('id', supabaseUser.id)
+                .maybeSingle(); // Use maybeSingle to avoid errors
 
-        setUser({
-            id: supabaseUser.id,
-            email: supabaseUser.email || '',
-            name: profile?.name || supabaseUser.user_metadata?.name || 'User',
-            university: profile?.university,
-            role: (profile?.role as Role) || 'student',
-            avatar_url: profile?.avatar_url,
-        });
+            if (error) {
+                console.error('Profile fetch error:', error);
+            }
+
+            setUser({
+                id: supabaseUser.id,
+                email: supabaseUser.email || '',
+                name: profile?.name || supabaseUser.user_metadata?.name || 'User',
+                university: profile?.university,
+                role: (profile?.role as Role) || 'student',
+                avatar_url: profile?.avatar_url,
+            });
+        } catch (error) {
+            console.error('Error setting user:', error);
+            // Set user with minimal data if profile fetch fails
+            setUser({
+                id: supabaseUser.id,
+                email: supabaseUser.email || '',
+                name: supabaseUser.user_metadata?.name || 'User',
+                university: undefined,
+                role: 'student',
+                avatar_url: undefined,
+            });
+        }
     };
 
     const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
@@ -145,8 +165,84 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             if (data.user) {
-                // Profile will be created by database trigger
-                // Just set the user state
+                // Wait a bit for trigger to execute
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Check if profile was created by trigger
+                const { data: existingProfile, error: checkError } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('id', data.user.id)
+                    .maybeSingle(); // Use maybeSingle to avoid error if profile doesn't exist
+
+                if (checkError) {
+                    console.error('Error checking profile:', checkError);
+                }
+
+                // If trigger didn't create profile, create it manually
+                if (!existingProfile) {
+                    console.log('Trigger did not create profile, creating manually...');
+
+                    // Try to get default organization (may not exist in fresh database)
+                    const { data: defaultOrg } = await supabase
+                        .from('organizations')
+                        .select('id')
+                        .eq('slug', 'unilib-platform')
+                        .maybeSingle(); // Use maybeSingle to avoid error if not found
+
+                    const organizationId = defaultOrg?.id || null;
+
+                    // Create profile manually
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert({
+                            id: data.user.id,
+                            email: data.user.email!,
+                            name: name,
+                            university: university,
+                            organization_id: organizationId, // Can be null if org doesn't exist
+                            role: ROLES.STUDENT,
+                            xp: 0,
+                            level: 1,
+                            streak_days: 0,
+                            total_pages_read: 0,
+                            total_books_completed: 0,
+                            is_active: true
+                        });
+
+                    if (profileError) {
+                        console.error('Profile creation error:', profileError);
+                        // If it's a foreign key constraint error, try without organization_id
+                        if (profileError.code === '23503' || profileError.code === '23502') {
+                            console.log('Retrying without organization_id...');
+                            const { error: retryError } = await supabase
+                                .from('profiles')
+                                .insert({
+                                    id: data.user.id,
+                                    email: data.user.email!,
+                                    name: name,
+                                    university: university,
+                                    organization_id: null,
+                                    role: ROLES.STUDENT,
+                                    xp: 0,
+                                    level: 1,
+                                    streak_days: 0,
+                                    total_pages_read: 0,
+                                    total_books_completed: 0,
+                                    is_active: true
+                                });
+
+                            if (retryError) {
+                                console.error('Retry profile creation error:', retryError);
+                                return { success: false, error: 'Failed to create user profile. Please contact support.' };
+                            }
+                        } else {
+                            return { success: false, error: 'Failed to create user profile. Please try again.' };
+                        }
+                    }
+                }
+
+                // Set the user state
                 setUser({
                     id: data.user.id,
                     email: data.user.email!,
@@ -154,6 +250,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     university: university,
                     role: ROLES.STUDENT
                 });
+
                 return { success: true };
             }
 
@@ -196,7 +293,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const checkIsAdmin = (): boolean => {
         if (!user) return false;
-        return ([ROLES.SUPER_ADMIN, ROLES.SYSTEM_ADMIN, ROLES.ORG_ADMIN] as string[]).includes(user.role);
+        // Include admins, librarians, and head librarians
+        return ([
+            ROLES.SUPER_ADMIN,
+            ROLES.SYSTEM_ADMIN,
+            ROLES.ORG_ADMIN,
+            ROLES.HEAD_LIBRARIAN,
+            ROLES.LIBRARIAN
+        ] as string[]).includes(user.role);
     };
 
     const checkIsSuperAdmin = (): boolean => {

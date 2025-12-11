@@ -76,6 +76,8 @@ export function useDashboardData(userId: string | undefined) {
             };
         },
         enabled: !!userId,
+        staleTime: 30000, // 30 seconds - data considered fresh
+        gcTime: 300000, // 5 minutes - cache time (renamed from cacheTime in v5)
     });
 }
 
