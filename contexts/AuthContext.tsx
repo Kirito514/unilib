@@ -77,34 +77,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             if (session?.user) {
+                // Set loading false immediately to show UI faster
+                setIsLoading(false);
                 await setUserFromSupabase(session.user);
+            } else {
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error checking user:', error);
             // Clear any invalid session
             await supabase.auth.signOut();
             setUser(null);
-        } finally {
             setIsLoading(false);
         }
     };
 
     const setUserFromSupabase = async (supabaseUser: SupabaseUser) => {
-        // Get user profile from profiles table
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('name, university, role, avatar_url')
-            .eq('id', supabaseUser.id)
-            .single();
+        try {
+            // Get user profile from profiles table
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('name, university, role, avatar_url')
+                .eq('id', supabaseUser.id)
+                .maybeSingle(); // Use maybeSingle to avoid errors
 
-        setUser({
-            id: supabaseUser.id,
-            email: supabaseUser.email || '',
-            name: profile?.name || supabaseUser.user_metadata?.name || 'User',
-            university: profile?.university,
-            role: (profile?.role as Role) || 'student',
-            avatar_url: profile?.avatar_url,
-        });
+            if (error) {
+                console.error('Profile fetch error:', error);
+            }
+
+            setUser({
+                id: supabaseUser.id,
+                email: supabaseUser.email || '',
+                name: profile?.name || supabaseUser.user_metadata?.name || 'User',
+                university: profile?.university,
+                role: (profile?.role as Role) || 'student',
+                avatar_url: profile?.avatar_url,
+            });
+        } catch (error) {
+            console.error('Error setting user:', error);
+            // Set user with minimal data if profile fetch fails
+            setUser({
+                id: supabaseUser.id,
+                email: supabaseUser.email || '',
+                name: supabaseUser.user_metadata?.name || 'User',
+                university: undefined,
+                role: 'student',
+                avatar_url: undefined,
+            });
+        }
     };
 
     const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
