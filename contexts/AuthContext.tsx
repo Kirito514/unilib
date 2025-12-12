@@ -69,7 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             // If there's an error (like invalid refresh token), clear the session
             if (error) {
-                console.warn('Session error:', error.message);
+                // This is expected when session expires - don't spam console
+                console.debug('Session expired or invalid, clearing:', error.message);
                 await supabase.auth.signOut();
                 setUser(null);
                 setIsLoading(false);

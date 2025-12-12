@@ -180,6 +180,22 @@ export default function CheckerPage() {
                 return;
             }
 
+            // Get librarian's organization as fallback
+            const { data: librarianProfile } = await supabase
+                .from('profiles')
+                .select('organization_id')
+                .eq('id', user.id)
+                .single();
+
+            // Use student's organization if available, otherwise use librarian's
+            const organizationId = student.organization_id || librarianProfile?.organization_id;
+
+            if (!organizationId) {
+                setError('Organization topilmadi. Iltimos, admin bilan bog\'laning.');
+                setLoading(false);
+                return;
+            }
+
             const dueDate = new Date();
             dueDate.setDate(dueDate.getDate() + 14);
 
@@ -187,7 +203,7 @@ export default function CheckerPage() {
                 user_id: student.id,
                 physical_copy_id: scannedBook.id,
                 librarian_id: user.id,
-                organization_id: student.organization_id,
+                organization_id: organizationId,
                 due_date: dueDate.toISOString()
             });
 
@@ -197,7 +213,7 @@ export default function CheckerPage() {
                     user_id: student.id,
                     physical_copy_id: scannedBook.id,
                     librarian_id: user.id,
-                    organization_id: student.organization_id,
+                    organization_id: organizationId,
                     due_date: dueDate.toISOString(),
                     status: 'active'
                 })
