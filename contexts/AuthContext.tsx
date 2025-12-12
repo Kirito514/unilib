@@ -31,6 +31,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
     const router = useRouter();
 
     // Check for existing session on mount
@@ -129,19 +130,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+        // Prevent concurrent login attempts
+        if (isLoggingIn) {
+            console.log('Login already in progress, ignoring duplicate request');
+            return { success: false, error: 'Login already in progress' };
+        }
+
         try {
+            setIsLoggingIn(true);
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) {
                 console.error('Login error:', error.message);
+                setIsLoggingIn(false);
                 return { success: false, error: error.message };
             }
             if (data.user) {
-                // Let onAuthStateChange listener fetch profile and set user
+                // Set user state immediately
+                await setUserFromSupabase(data.user);
+                setIsLoggingIn(false);
                 return { success: true };
             }
+            setIsLoggingIn(false);
             return { success: false, error: 'Login failed' };
         } catch (err: any) {
             console.error('Login error:', err);
+            setIsLoggingIn(false);
             return { success: false, error: err.message || 'An unexpected error occurred' };
         }
     };
@@ -184,16 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (!existingProfile) {
                     console.log('Trigger did not create profile, creating manually...');
 
-                    // Try to get default organization (may not exist in fresh database)
-                    const { data: defaultOrg } = await supabase
-                        .from('organizations')
-                        .select('id')
-                        .eq('slug', 'unilib-platform')
-                        .maybeSingle(); // Use maybeSingle to avoid error if not found
-
-                    const organizationId = defaultOrg?.id || null;
-
-                    // Create profile manually
+                    // Create profile manually (without organization_id)
                     const { error: profileError } = await supabase
                         .from('profiles')
                         .insert({
@@ -201,7 +205,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                             email: data.user.email!,
                             name: name,
                             university: university,
-                            organization_id: organizationId, // Can be null if org doesn't exist
                             role: ROLES.STUDENT,
                             xp: 0,
                             level: 1,
@@ -213,33 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
                     if (profileError) {
                         console.error('Profile creation error:', profileError);
-                        // If it's a foreign key constraint error, try without organization_id
-                        if (profileError.code === '23503' || profileError.code === '23502') {
-                            console.log('Retrying without organization_id...');
-                            const { error: retryError } = await supabase
-                                .from('profiles')
-                                .insert({
-                                    id: data.user.id,
-                                    email: data.user.email!,
-                                    name: name,
-                                    university: university,
-                                    organization_id: null,
-                                    role: ROLES.STUDENT,
-                                    xp: 0,
-                                    level: 1,
-                                    streak_days: 0,
-                                    total_pages_read: 0,
-                                    total_books_completed: 0,
-                                    is_active: true
-                                });
-
-                            if (retryError) {
-                                console.error('Retry profile creation error:', retryError);
-                                return { success: false, error: 'Failed to create user profile. Please contact support.' };
-                            }
-                        } else {
-                            return { success: false, error: 'Failed to create user profile. Please try again.' };
-                        }
+                        return { success: false, error: 'Failed to create user profile. Please try again.' };
                     }
                 }
 

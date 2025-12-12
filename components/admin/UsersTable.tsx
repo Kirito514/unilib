@@ -131,13 +131,21 @@ export function UsersTable({ users: initialUsers, page, totalPages, totalUsers }
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
-                                        {user.student_number || user.student_id ? (
-                                            <span className="font-mono text-xs bg-blue-500/10 text-blue-600 px-2 py-1 rounded">
-                                                {user.student_number || user.student_id}
-                                            </span>
-                                        ) : (
-                                            <span className="text-muted-foreground text-xs">-</span>
-                                        )}
+                                        <div className="flex flex-col gap-1">
+                                            {user.student_id && (
+                                                <span className="font-mono text-xs bg-green-500/10 text-green-600 px-2 py-1 rounded inline-block">
+                                                    Student ID: {user.student_id}
+                                                </span>
+                                            )}
+                                            {user.student_number && (
+                                                <span className="font-mono text-xs bg-blue-500/10 text-blue-600 px-2 py-1 rounded inline-block">
+                                                    HEMIS: {user.student_number}
+                                                </span>
+                                            )}
+                                            {!user.student_id && !user.student_number && (
+                                                <span className="text-muted-foreground text-xs">-</span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-4 py-3 text-muted-foreground text-sm">{user.email}</td>
                                     <td className="px-4 py-3">

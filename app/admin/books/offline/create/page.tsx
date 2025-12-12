@@ -44,22 +44,6 @@ export default function CreateOfflineBookPage() {
         const formData = new FormData(e.currentTarget);
 
         try {
-            // Get user's organization_id first
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('User not authenticated');
-
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('organization_id')
-                .eq('id', user.id)
-                .single();
-
-            if (!profile?.organization_id) {
-                alert('Tashkilot topilmadi. Iltimos, admin bilan bog\'laning.');
-                setLoading(false);
-                return;
-            }
-
             const bookData = {
                 title: formData.get('title') as string,
                 author: formData.get('author') as string,
@@ -67,16 +51,17 @@ export default function CreateOfflineBookPage() {
                 description: formData.get('description') as string,
                 cover_color: formData.get('cover_color') as string,
                 book_type: 'offline',
-                rating: 5.0,
-                organization_id: profile.organization_id
+                rating: 5.0
             };
 
             // Create the book
+            console.time('⏱️ Book insert');
             const { data: book, error: bookError } = await supabase
                 .from('books')
                 .insert([bookData])
                 .select()
                 .single();
+            console.timeEnd('⏱️ Book insert');
 
             if (bookError) throw bookError;
 
@@ -102,16 +87,10 @@ export default function CreateOfflineBookPage() {
                 }
             }
 
-            // Get organization info for auto-generated barcodes
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('organizations(slug)')
-                .eq('id', user.id)
-                .single();
+            // Generate barcode prefix from first letter of book title
+            const titlePrefix = bookData.title.charAt(0).toUpperCase().charCodeAt(0).toString().slice(-2).padStart(2, '0');
 
-            const orgSlug = (profileData?.organizations as any)?.slug || 'UNI';
-
-            // Generate copies
+            // Generate copies with 10-digit barcodes
             const copies = [];
             for (let i = 1; i <= numberOfCopies; i++) {
                 let barcode;
@@ -120,23 +99,20 @@ export default function CreateOfflineBookPage() {
                     // Use existing barcode from array
                     barcode = existingBarcodes[i - 1] || `NO-BARCODE-${i}`;
                 } else {
-                    // Generate 13-digit numeric barcode (EAN-13 format)
-                    // Format: XXYYYYYYYYYZZZ = 13 digits total
-                    // XX = organization code (2 digits)
-                    // YYYYYYYYY = book ID hash (8 digits) 
+                    // Generate 10-digit numeric barcode (CODE128)
+                    // Format: XXXXXXXZZZ = 10 digits total
+                    // XXXXXXX = book ID hash (7 digits) 
                     // ZZZ = copy number (3 digits)
-
-                    const orgCode = orgSlug.charCodeAt(0).toString().slice(-2).padStart(2, '0');
 
                     let hash = 0;
                     for (let j = 0; j < book.id.length; j++) {
                         hash = ((hash << 5) - hash) + book.id.charCodeAt(j);
                         hash = hash & hash;
                     }
-                    const bookHash = Math.abs(hash).toString().slice(0, 8).padStart(8, '0');
+                    const bookHash = Math.abs(hash).toString().slice(0, 7).padStart(7, '0');
 
                     const copyNum = String(i).padStart(3, '0');
-                    barcode = `${orgCode}${bookHash}${copyNum}`;
+                    barcode = `${bookHash}${copyNum}`;
                 }
 
                 copies.push({
@@ -144,14 +120,15 @@ export default function CreateOfflineBookPage() {
                     barcode: barcode,
                     copy_number: i,
                     location: location,
-                    organization_id: profile.organization_id,
                     status: 'available'
                 });
             }
 
+            console.time('⏱️ Copies insert');
             const { error: copiesError } = await supabase
                 .from('physical_book_copies')
                 .insert(copies);
+            console.timeEnd('⏱️ Copies insert');
 
             if (copiesError) {
                 console.error('Copies insert error:', copiesError);
@@ -167,8 +144,12 @@ export default function CreateOfflineBookPage() {
                 return;
             }
 
+
             // Store generated barcodes and show modal
-            setGeneratedBarcodes(copies.map(c => c.barcode));
+            const barcodes = copies.map(c => c.barcode);
+            console.log('📊 Generated barcodes:', barcodes);
+            console.log('📊 Number of copies:', copies.length);
+            setGeneratedBarcodes(barcodes);
             setShowBarcodeModal(true);
         } catch (error: any) {
             console.error('Error creating offline book:', error);
@@ -181,13 +162,15 @@ export default function CreateOfflineBookPage() {
             } else {
                 alert('Xatolik yuz berdi! Iltimos, qaytadan urinib ko\'ring.');
             }
-
+        } finally {
+            // Always reset loading state
             setLoading(false);
         }
     }, [barcodeMode, router, copyCount, existingBarcodes]);
 
     const handleCloseModal = () => {
         setShowBarcodeModal(false);
+        setLoading(false);  // ✅ Reset loading state
         router.push('/admin/books/offline');
         router.refresh();
     };
@@ -343,8 +326,8 @@ export default function CreateOfflineBookPage() {
                                                         }, 500);
                                                     }}
                                                     className={`w-full px-3 py-2 bg-background border rounded-lg focus:ring-2 outline-none transition-all font-mono text-sm ${hasError
-                                                            ? 'border-red-500 focus:ring-red-500/50'
-                                                            : 'border-border focus:ring-primary/50'
+                                                        ? 'border-red-500 focus:ring-red-500/50'
+                                                        : 'border-border focus:ring-primary/50'
                                                         }`}
                                                     placeholder={`Barcode ${i + 1}`}
                                                 />

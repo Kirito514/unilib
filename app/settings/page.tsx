@@ -148,8 +148,8 @@ export default function SettingsPage() {
                         </button>
                     </div>
 
-                    {/* Delete Account Section */}
-                    <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-6 shadow-xl">
+                    {/* Delete Account Section - Hidden */}
+                    <div className="hidden bg-red-500/5 border border-red-500/20 rounded-2xl p-6 shadow-xl">
                         <div className="flex items-start gap-4 mb-4">
                             <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
                                 <AlertTriangle className="w-5 h-5 text-red-500" />

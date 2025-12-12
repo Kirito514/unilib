@@ -7,7 +7,9 @@ import { awardXP } from './actions';
 
 export default function CheckerPage() {
     const inputRef = useRef<HTMLInputElement>(null);
+    const bookInputRef = useRef<HTMLInputElement>(null);
     const [scanInput, setScanInput] = useState('');
+    const [bookInput, setBookInput] = useState('');
     const [student, setStudent] = useState<any>(null);
     const [scannedBook, setScannedBook] = useState<any>(null);
     const [activeLoans, setActiveLoans] = useState<any[]>([]);
@@ -37,7 +39,13 @@ export default function CheckerPage() {
     };
 
     useEffect(() => {
-        inputRef.current?.focus();
+        if (student && !scannedBook) {
+            // Focus book input when student found
+            bookInputRef.current?.focus();
+        } else if (!student) {
+            // Focus student input when no student
+            inputRef.current?.focus();
+        }
     }, [student, scannedBook]);
 
     const showSuccess = (message: string) => {
@@ -54,27 +62,35 @@ export default function CheckerPage() {
         setError('');
         setSuccessMessage('');
         setScanInput('');
+        setBookInput('');
+        setLoading(false);
         inputRef.current?.focus();
     };
 
     const handleScan = async () => {
-        if (!scanInput.trim()) return;
+        const input = student ? bookInput : scanInput;
+        if (!input.trim()) return;
         setLoading(true);
         setError('');
 
         try {
-            const isBookBarcode = scanInput.startsWith('BOOK-') || scanInput.startsWith('978-') || /^\d{13}$/.test(scanInput);
+            // Book barcode: 10 digits (e.g., 4030580002) or starts with BOOK- or 978-
+            // Student ID: 5 digits (e.g., 77777, 25001)
+            const isBookBarcode = input.startsWith('BOOK-') ||
+                input.startsWith('978-') ||
+                /^\d{10,}$/.test(input); // 10+ digits = book
 
             if (!isBookBarcode) {
                 // Clean input - remove any prefix and trim
-                const studentNumber = scanInput.replace('STUDENT-UNI-', '').trim();
+                const studentNumber = input.replace('STUDENT-UNI-', '').trim();
                 console.log('🔍 Searching for student_number:', studentNumber);
+                console.log('🔍 Query will be: student_number.eq.' + studentNumber + ' OR student_id.eq.' + studentNumber);
 
                 // Optimized query - select only needed fields
                 const startTime = performance.now();
                 const { data: profiles, error: profileError } = await supabase
                     .from('profiles')
-                    .select('id, name, email, student_id, student_number, avatar_url, xp, phone, faculty, student_group, course, education_form, specialty, gpa, organization_id')
+                    .select('id, name, email, student_id, student_number, avatar_url, xp, phone, faculty, student_group, course, education_form, specialty, gpa')
                     .or(`student_number.eq.${studentNumber},student_id.eq.${studentNumber}`)
                     .limit(1);
 
@@ -83,14 +99,23 @@ export default function CheckerPage() {
 
                 console.log('📊 Search result:', { profiles, profileError, count: profiles?.length });
 
-                if (profileError) {
-                    console.error('❌ Search error:', profileError);
+                if (profiles && profiles.length > 0) {
+                    console.log('📋 Found profile:', profiles[0]);
                 }
 
-                if (profileError || !profiles || profiles.length === 0) {
-                    setError(`Talaba topilmadi: ${studentNumber}`);
-                    setLoading(false);
+                if (profileError) {
+                    console.error('❌ Search error:', profileError);
+                    setError(`Qidirishda xatolik: ${profileError.message}`);
                     setScanInput('');
+                    setLoading(false);
+                    return;
+                }
+
+                if (!profiles || profiles.length === 0) {
+                    console.warn('⚠️ No profiles found for:', studentNumber);
+                    setError(`Talaba topilmadi: ${studentNumber}`);
+                    setScanInput('');
+                    setLoading(false);
                     return;
                 }
 
@@ -100,7 +125,7 @@ export default function CheckerPage() {
 
                 // Fetch loans - only active ones
                 const loansStartTime = performance.now();
-                const { data: loans } = await supabase
+                const { data: loans, error: loansError } = await supabase
                     .from('book_checkouts')
                     .select(`
                         id,
@@ -119,57 +144,65 @@ export default function CheckerPage() {
                 const loansTime = performance.now() - loansStartTime;
                 console.log(`⏱️ Loans query took: ${loansTime.toFixed(2)}ms`);
 
+                if (loansError) {
+                    console.error('❌ Loans error:', loansError);
+                }
+
                 setActiveLoans(loans || []);
             } else {
                 if (!student) {
                     setError('Avval talabani skanerlang');
-                    setLoading(false);
                     setScanInput('');
+                    setLoading(false);
                     return;
                 }
 
                 const hasOverdue = activeLoans.some(loan => new Date(loan.due_date) < new Date());
                 if (hasOverdue) {
                     setError('Talabada muddati o\'tgan kitoblar bor!');
-                    setLoading(false);
                     setScanInput('');
+                    setLoading(false);
                     return;
                 }
 
                 if (activeLoans.length >= 5) {
                     setError('Maksimal 5 ta kitob!');
-                    setLoading(false);
                     setScanInput('');
+                    setLoading(false);
                     return;
                 }
 
                 const { data: copy, error: copyError } = await supabase
                     .from('physical_book_copies')
                     .select(`*, books(*)`)
-                    .eq('barcode', scanInput)
+                    .eq('barcode', input)
                     .single();
 
                 if (copyError || !copy) {
                     setError('Kitob topilmadi');
+                    setBookInput('');
                     setLoading(false);
-                    setScanInput('');
                     return;
                 }
 
                 if (copy.status !== 'available') {
                     setError(`Kitob mavjud emas`);
+                    setBookInput('');
                     setLoading(false);
-                    setScanInput('');
                     return;
                 }
 
                 setScannedBook(copy);
             }
 
-            setScanInput('');
+            // Clear book input after scan
+            if (isBookBarcode) {
+                setBookInput('');
+            }
         } catch (err) {
             console.error('Scan error:', err);
             setError('Xatolik yuz berdi');
+            setScanInput('');
         } finally {
             setLoading(false);
         }
@@ -189,22 +222,6 @@ export default function CheckerPage() {
                 return;
             }
 
-            // Get librarian's organization as fallback
-            const { data: librarianProfile } = await supabase
-                .from('profiles')
-                .select('organization_id')
-                .eq('id', user.id)
-                .single();
-
-            // Use student's organization if available, otherwise use librarian's
-            const organizationId = student.organization_id || librarianProfile?.organization_id;
-
-            if (!organizationId) {
-                setError('Organization topilmadi. Iltimos, admin bilan bog\'laning.');
-                setLoading(false);
-                return;
-            }
-
             const dueDate = new Date();
             dueDate.setDate(dueDate.getDate() + 14);
 
@@ -212,7 +229,6 @@ export default function CheckerPage() {
                 user_id: student.id,
                 physical_copy_id: scannedBook.id,
                 librarian_id: user.id,
-                organization_id: organizationId,
                 due_date: dueDate.toISOString()
             });
 
@@ -222,7 +238,6 @@ export default function CheckerPage() {
                     user_id: student.id,
                     physical_copy_id: scannedBook.id,
                     librarian_id: user.id,
-                    organization_id: organizationId,
                     due_date: dueDate.toISOString(),
                     status: 'active'
                 })
@@ -390,7 +405,7 @@ export default function CheckerPage() {
                                         value={scanInput}
                                         onChange={(e) => setScanInput(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleScan()}
-                                        placeholder="Student QR skanerlang..."
+                                        placeholder="Student QR yoki Student ID (24001)..."
                                         className="w-full px-4 py-3 bg-background/50 backdrop-blur-sm border-2 border-border rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none font-mono transition-all group-hover:border-primary/30"
                                         disabled={!!student}
                                     />
@@ -445,9 +460,10 @@ export default function CheckerPage() {
                                 <div className="flex gap-3 mb-4">
                                     <div className="flex-1 relative group">
                                         <input
+                                            ref={bookInputRef}
                                             type="text"
-                                            value={scanInput}
-                                            onChange={(e) => setScanInput(e.target.value)}
+                                            value={bookInput}
+                                            onChange={(e) => setBookInput(e.target.value)}
                                             onKeyPress={(e) => e.key === 'Enter' && handleScan()}
                                             placeholder="Kitob barcode skanerlang..."
                                             className="w-full px-4 py-3 bg-background/50 backdrop-blur-sm border-2 border-border rounded-lg focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none font-mono transition-all group-hover:border-accent/30"
@@ -460,7 +476,7 @@ export default function CheckerPage() {
                                     </div>
                                     <button
                                         onClick={handleScan}
-                                        disabled={loading || !scanInput.trim()}
+                                        disabled={loading || !bookInput.trim()}
                                         className="px-6 py-3 bg-gradient-to-br from-accent to-accent/80 text-accent-foreground rounded-lg hover:from-accent/90 hover:to-accent/70 disabled:opacity-50 transition-all hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-accent/20"
                                     >
                                         <Scan className="w-5 h-5" />
@@ -498,10 +514,6 @@ export default function CheckerPage() {
                     <div className="space-y-4">
                         {/* Student Card - Glassmorphism */}
                         <div className="relative bg-gradient-to-br from-primary/20 via-accent/10 to-primary/5 backdrop-blur-xl border-2 border-primary/30 rounded-2xl p-6 overflow-hidden shadow-2xl shadow-primary/10">
-                            {/* Animated background orbs */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-                            <div className="absolute bottom-0 left-0 w-24 h-24 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-
                             <div className="relative z-10">
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="relative">
@@ -516,8 +528,6 @@ export default function CheckerPage() {
                                                 <User className="w-10 h-10 text-white" />
                                             </div>
                                         )}
-                                        {/* Glow effect */}
-                                        <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-pulse" />
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">{student.name}</h3>

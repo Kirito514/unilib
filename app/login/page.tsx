@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +36,6 @@ export default function LoginPage() {
             const result = await login(email, password);
             if (!result.success) {
                 setError(result.error || 'Email yoki parol noto\'g\'ri');
-                setIsLoading(false);
             } else {
                 toast.success('Muvaffaqiyatli!', {
                     description: 'Tizimga kirildi. Dashboard\'ga yo\'naltirilmoqda...',
@@ -46,6 +44,7 @@ export default function LoginPage() {
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        } finally {
             setIsLoading(false);
         }
     }, [email, password, login]);
@@ -66,27 +65,25 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (!data.success) {
-                setError(data.error || 'HEMIS login xatosi');
-                setIsLoading(false);
+                setError(data.error || 'HEMIS tizimiga ulanishda xatolik');
             } else {
                 // Use returned credentials to login via Supabase
                 if (data.data.email && data.data.password) {
                     const loginResult = await login(data.data.email, data.data.password);
                     if (!loginResult.success) {
-                        setError('Login xatosi');
-                        setIsLoading(false);
+                        setError(loginResult.error || 'Tizimga kirishda xatolik');
                     } else {
                         toast.success('Muvaffaqiyatli!', {
                             description: 'HEMIS orqali kirildi. Dashboard\'ga yo\'naltirilmoqda...',
                             icon: <CheckCircle className="w-5 h-5" />
                         });
 
-                        // Background sync (non-blocking)
-                        if (user?.id) {
+                        // Background sync with user ID from login result
+                        if (data.data.userId) {
                             fetch('/api/hemis/background-sync', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ userId: user.id }),
+                                body: JSON.stringify({ userId: data.data.userId }),
                             }).catch(err => console.log('Background sync failed:', err));
                         }
                     }
@@ -99,6 +96,7 @@ export default function LoginPage() {
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        } finally {
             setIsLoading(false);
         }
     }, [hemisLogin, hemisPassword, login]);
@@ -120,13 +118,11 @@ export default function LoginPage() {
 
             if (!data.success) {
                 setError(data.error || 'Foydalanuvchi topilmadi');
-                setIsLoading(false);
             } else {
                 // Login with database credentials
                 const loginResult = await login(data.data.email, data.data.password);
                 if (!loginResult.success) {
-                    setError('Login xatosi');
-                    setIsLoading(false);
+                    setError(loginResult.error || 'Tizimga kirishda xatolik');
                 } else {
                     toast.success('Muvaffaqiyatli!', {
                         description: 'Bazadagi ma\'lumotlar bilan kirildi',
@@ -135,7 +131,8 @@ export default function LoginPage() {
                 }
             }
         } catch (err) {
-            setError('Xatolik yuz berdi');
+            setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        } finally {
             setIsLoading(false);
         }
     }, [hemisLogin, login]);
@@ -216,19 +213,7 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {!useHemisLogin && (
-                            <div className="flex items-center justify-between">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={rememberMe}
-                                        onChange={(e) => setRememberMe(e.target.checked)}
-                                        className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/20"
-                                    />
-                                    <span className="text-sm text-muted-foreground">Eslab qolish</span>
-                                </label>
-                            </div>
-                        )}
+
 
                         <button
                             type="submit"

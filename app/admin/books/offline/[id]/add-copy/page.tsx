@@ -105,17 +105,10 @@ export default function AddCopyPage({ params }: PageProps) {
                 }
             }
 
-            // Get organization info
-            const { data: { user } } = await supabase.auth.getUser();
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('organizations(slug), organization_id')
-                .eq('id', user?.id)
-                .single();
+            // Get book title for barcode prefix
+            const titlePrefix = book.title.charAt(0).toUpperCase().charCodeAt(0).toString().slice(-2).padStart(2, '0');
 
-            const orgSlug = (profile?.organizations as any)?.slug || 'UNI';
-
-            // Generate copies
+            // Generate copies with 10-digit barcodes
             const copies = [];
             for (let i = 0; i < numberOfCopies; i++) {
                 const copyNumber = nextCopyNumber + i;
@@ -125,18 +118,20 @@ export default function AddCopyPage({ params }: PageProps) {
                     // Use existing barcode from array
                     barcode = existingBarcodes[i] || `NO-BARCODE-${copyNumber}`;
                 } else {
-                    // Generate 13-digit numeric barcode (CODE128 format)
-                    const orgCode = orgSlug.charCodeAt(0).toString().slice(-2).padStart(2, '0');
+                    // Generate 10-digit numeric barcode (CODE128)
+                    // Format: XXXXXXXZZZ = 10 digits total
+                    // XXXXXXX = book ID hash (7 digits)
+                    // ZZZ = copy number (3 digits)
 
                     let hash = 0;
                     for (let j = 0; j < bookId.length; j++) {
                         hash = ((hash << 5) - hash) + bookId.charCodeAt(j);
                         hash = hash & hash;
                     }
-                    const bookHash = Math.abs(hash).toString().slice(0, 8).padStart(8, '0');
+                    const bookHash = Math.abs(hash).toString().slice(0, 7).padStart(7, '0');
 
                     const copyNum = String(copyNumber).padStart(3, '0');
-                    barcode = `${orgCode}${bookHash}${copyNum}`;
+                    barcode = `${bookHash}${copyNum}`;
                 }
 
                 copies.push({
@@ -144,23 +139,27 @@ export default function AddCopyPage({ params }: PageProps) {
                     barcode: barcode,
                     copy_number: copyNumber,
                     location: location,
-                    organization_id: (profile as any)?.organization_id,
                     status: 'available'
                 });
             }
 
+            console.log('📊 Inserting copies:', copies);
             const { error } = await supabase
                 .from('physical_book_copies')
                 .insert(copies);
 
             if (error) {
-                console.error('Insert error:', error);
+                console.error('❌ Insert error:', error);
+                console.error('❌ Error code:', error.code);
+                console.error('❌ Error message:', error.message);
+                console.error('❌ Error details:', error.details);
+                console.error('❌ Error hint:', error.hint);
 
                 // Check for duplicate barcode
                 if (error.code === '23505') {
                     alert('Xatolik: Barcode allaqachon mavjud! Boshqa barcode kiriting.');
                 } else {
-                    alert(`Nusxalarni qo'shishda xatolik: ${error.message}`);
+                    alert(`Nusxalarni qo'shishda xatolik: ${error.message || 'Noma\'lum xatolik'}`);
                 }
 
                 setSaving(false);
@@ -281,8 +280,8 @@ export default function AddCopyPage({ params }: PageProps) {
                                                         }, 500);
                                                     }}
                                                     className={`w-full px-3 py-2 bg-background border rounded-lg focus:ring-2 outline-none transition-all font-mono text-sm ${hasError
-                                                            ? 'border-red-500 focus:ring-red-500/50'
-                                                            : 'border-border focus:ring-primary/50'
+                                                        ? 'border-red-500 focus:ring-red-500/50'
+                                                        : 'border-border focus:ring-primary/50'
                                                         }`}
                                                     placeholder={`Barcode ${i + 1}`}
                                                 />

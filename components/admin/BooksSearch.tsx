@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Filter, X, SlidersHorizontal } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -19,7 +19,18 @@ export function BooksSearch({ categories = [], showStatusFilter = false }: Books
     const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'created_at');
     const [showFilters, setShowFilters] = useState(false);
 
-    const applyFilters = () => {
+    // Debounced search - auto-apply filters after 500ms of no typing
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery !== searchParams.get('search')) {
+                applyFilters();
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const applyFilters = useCallback(() => {
         const params = new URLSearchParams();
 
         if (searchQuery) params.set('search', searchQuery);
@@ -28,7 +39,7 @@ export function BooksSearch({ categories = [], showStatusFilter = false }: Books
         if (sortBy && sortBy !== 'created_at') params.set('sort', sortBy);
 
         router.push(`?${params.toString()}`);
-    };
+    }, [searchQuery, selectedCategory, selectedStatus, sortBy, router]);
 
     const clearFilters = () => {
         setSearchQuery('');
@@ -58,8 +69,8 @@ export function BooksSearch({ categories = [], showStatusFilter = false }: Books
                 <button
                     onClick={() => setShowFilters(!showFilters)}
                     className={`px-4 py-3 border-2 rounded-lg transition-all flex items-center gap-2 ${showFilters || hasActiveFilters
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-border hover:border-primary'
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border hover:border-primary'
                         }`}
                 >
                     <SlidersHorizontal className="w-5 h-5" />

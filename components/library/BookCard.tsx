@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, BookOpen, Eye, Wifi, WifiOff } from 'lucide-react';
+import { memo } from 'react';
 
 interface BookCardProps {
     id: string;
@@ -15,7 +16,8 @@ interface BookCardProps {
     hasPhysicalCopy?: boolean;
 }
 
-export function BookCard({ id, title, author, rating, coverColor, category, cover_url, readersCount, views_count, hasPhysicalCopy }: BookCardProps) {
+// ✅ Memoized to prevent unnecessary re-renders
+export const BookCard = memo(function BookCard({ id, title, author, rating, coverColor, category, cover_url, readersCount, views_count, hasPhysicalCopy }: BookCardProps) {
     return (
         <Link href={`/library/${id}`} className="group block h-full">
             <div className="relative h-full flex flex-col bg-background/40 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/5 hover:border-primary/50 hover:-translate-y-1 transition-all duration-300">
@@ -28,6 +30,7 @@ export function BookCard({ id, title, author, rating, coverColor, category, cove
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                            loading="lazy"
                         />
                     ) : (
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
@@ -94,4 +97,4 @@ export function BookCard({ id, title, author, rating, coverColor, category, cove
             </div>
         </Link>
     );
-}
+});

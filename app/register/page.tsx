@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { BookOpen, Mail, Lock, User, Building, ArrowRight, Sparkles, Check, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, Mail, Lock, User, ArrowRight, Sparkles, Check, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Password strength calculator
@@ -33,8 +33,7 @@ export default function RegisterPage() {
         name: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        university: ''
+        confirmPassword: ''
     });
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [error, setError] = useState('');
@@ -110,8 +109,7 @@ export default function RegisterPage() {
             const result = await register(
                 formData.name,
                 formData.email,
-                formData.password,
-                formData.university
+                formData.password
             );
 
             if (!result.success) {
@@ -216,24 +214,6 @@ export default function RegisterPage() {
                                     {fieldErrors.email}
                                 </p>
                             )}
-                        </div>
-
-                        <div>
-                            <label htmlFor="university" className="block text-sm font-medium text-foreground mb-2">
-                                Universitet (ixtiyoriy)
-                            </label>
-                            <div className="relative">
-                                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                                <input
-                                    id="university"
-                                    name="university"
-                                    type="text"
-                                    value={formData.university}
-                                    onChange={handleChange}
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-muted/50 border border-border focus:border-primary focus:bg-background transition-all outline-none text-foreground placeholder:text-muted-foreground"
-                                    placeholder="Toshkent Davlat Universiteti"
-                                />
-                            </div>
                         </div>
 
                         <div>

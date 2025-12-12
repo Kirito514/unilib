@@ -451,7 +451,10 @@ export default function ProfilePage() {
                         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
                             {/* Student ID Card with QR/Barcode - Lazy Loaded */}
                             {(profile.student_number || profile.student_id) && (
-                                <StudentIDCard studentNumber={profile.student_number || profile.student_id} />
+                                <StudentIDCard
+                                    studentNumber={profile.student_number || profile.student_id}
+                                    studentId={profile.student_id}
+                                />
                             )}
 
                             {/* XP Card */}
