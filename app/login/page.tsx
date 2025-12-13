@@ -36,18 +36,20 @@ export default function LoginPage() {
             const result = await login(email, password);
             if (!result.success) {
                 setError(result.error || 'Email yoki parol noto\'g\'ri');
+                setIsLoading(false);
             } else {
+                // Immediate redirect - don't wait
+                router.push('/dashboard');
                 toast.success('Muvaffaqiyatli!', {
-                    description: 'Tizimga kirildi. Dashboard\'ga yo\'naltirilmoqda...',
+                    description: 'Tizimga kirildi',
                     icon: <CheckCircle className="w-5 h-5" />
                 });
             }
         } catch (err) {
             setError('Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
-        } finally {
             setIsLoading(false);
         }
-    }, [email, password, login]);
+    }, [email, password, login, router]);
 
     // HEMIS login handler
     const handleHemisLogin = useCallback(async (e: React.FormEvent) => {

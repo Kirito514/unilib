@@ -54,7 +54,7 @@ export function AISearchBar({ className }: { className?: string }) {
                         "Yangi boshlovchilar uchun mashinali o'qitish",
                         "Iqtisodiyot asoslari",
                         "Kvant fizikasi tarixi",
-                        "O'zbek adabiyoti durdonalari"
+                        "o'zbek adabiyoti durdonalari"
                     ].map((suggestion, i) => (
                         <button
                             key={i}

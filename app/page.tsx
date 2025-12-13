@@ -32,22 +32,28 @@ export default async function LandingPage() {
     const topBooks = await getTopBooks();
 
     return (
-        <div className="flex flex-col min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+        <div className="relative flex flex-col min-h-screen text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+            {/* Fixed Gradient Background for Entire Page */}
+            <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/5 -z-10" />
+            <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full md:w-[1000px] h-[600px] bg-gradient-to-r from-primary/20 to-accent/20 blur-[120px] rounded-full opacity-60 -z-10" />
+            <div className="fixed top-20 right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10" />
+            <div className="fixed bottom-20 left-20 w-80 h-80 bg-accent/10 rounded-full blur-3xl -z-10" />
+            <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.15] mix-blend-soft-light -z-10" />
 
             {/* Hero Section */}
             <PilotHero />
 
             {/* Stats Section */}
-            <section className="py-24 bg-background overflow-hidden border-y border-border/50">
+            <section className="py-24 overflow-hidden">
                 <div className="container px-4 mx-auto max-w-7xl">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                         {[
                             { label: "Mavjud Kitoblar", value: "10k+", icon: Library },
                             { label: "Faol Talabalar", value: "5k+", icon: Users },
-                            { label: "O'quv Guruhlari", value: "150+", icon: Users },
+                            { label: "o'quv Guruhlari", value: "150+", icon: Users },
                             { label: "Iqtiboslar", value: "1M+", icon: Quote }
                         ].map((stat, i) => (
-                            <div key={i} className="flex flex-col items-center justify-center text-center group p-6 rounded-3xl bg-muted/20 hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/20">
+                            <div key={i} className="flex flex-col items-center justify-center text-center group p-6 rounded-3xl bg-background/40 backdrop-blur-sm hover:bg-primary/5 transition-colors border border-border/30 hover:border-primary/50 shadow-lg">
                                 <div className="mb-4 p-4 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors text-primary">
                                     <stat.icon className="w-8 h-8" />
                                 </div>
@@ -63,7 +69,7 @@ export default async function LandingPage() {
             <FeaturedBooks books={topBooks} />
 
             {/* Popular Categories */}
-            <section className="py-24 md:py-32 bg-background overflow-hidden">
+            <section className="py-24 md:py-32 overflow-hidden">
                 <div className="container px-4 md:px-6 max-w-7xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold mb-6">Ommabop Yo'nalishlar</h2>
@@ -85,7 +91,7 @@ export default async function LandingPage() {
                             { name: 'San\'at', icon: Palette },
                             { name: 'Biznes', icon: Briefcase }
                         ].map((cat, i) => (
-                            <Link key={i} href={`/library?category=${cat.name}`} className="group p-6 rounded-2xl bg-muted/20 border border-transparent hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all text-center flex flex-col items-center gap-4">
+                            <Link key={i} href={`/library?category=${cat.name}`} className="group p-6 rounded-2xl bg-background/40 backdrop-blur-sm border border-border/30 hover:border-primary/50 hover:bg-primary/5 hover:shadow-xl transition-all text-center flex flex-col items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-300">
                                     <cat.icon className="w-6 h-6" />
                                 </div>
@@ -97,13 +103,13 @@ export default async function LandingPage() {
             </section>
 
             {/* About Section */}
-            <section id="about" className="py-24 md:py-32 bg-muted/20 overflow-hidden">
+            <section id="about" className="py-24 md:py-32 overflow-hidden">
                 <div className="container px-4 md:px-6 max-w-6xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-16 items-center">
                         <div>
                             <h2 className="text-3xl md:text-5xl font-bold mb-8 text-foreground">Loyiha Maqsadi</h2>
                             <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
-                                Ushbu platforma O'zbekiston ta'lim tizimini raqamlashtirish va talabalar uchun yagona, qulay bilim olish muhitini yaratish maqsadida ishlab chiqilgan.
+                                Ushbu platforma o'zbekiston ta'lim tizimini raqamlashtirish va talabalar uchun yagona, qulay bilim olish muhitini yaratish maqsadida ishlab chiqilgan.
                             </p>
                             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                                 Bizning asosiy vazifamiz — har bir talabaga sifatli ta'lim resurslaridan foydalanish imkoniyatini berish va akademik halollikni ta'minlashdir.
@@ -130,7 +136,7 @@ export default async function LandingPage() {
             </section>
 
             {/* Contact Section */}
-            <section id="contact" className="py-24 md:py-32 bg-background overflow-hidden">
+            <section id="contact" className="py-24 md:py-32 overflow-hidden">
                 <div className="container px-4 md:px-6 max-w-4xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold mb-6 text-foreground">Biz Bilan Bog'laning</h2>
@@ -139,37 +145,34 @@ export default async function LandingPage() {
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-8">
-                        <div className="p-8 rounded-3xl bg-muted/20 border border-transparent hover:border-primary/50 text-center hover:shadow-xl transition-all group">
+                        <div className="p-8 rounded-3xl bg-background/40 backdrop-blur-sm border border-border/30 hover:border-primary/50 text-center hover:shadow-xl transition-all group">
                             <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <Mail className="w-8 h-8 text-primary" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Email</h3>
-                            <p className="text-muted-foreground">info@unilib.uz</p>
+                            <p className="text-muted-foreground">info@umft-official.uz</p>
                         </div>
-                        <div className="p-8 rounded-3xl bg-muted/20 border border-transparent hover:border-primary/50 text-center hover:shadow-xl transition-all group">
+                        <div className="p-8 rounded-3xl bg-background/40 backdrop-blur-sm border border-border/30 hover:border-primary/50 text-center hover:shadow-xl transition-all group">
                             <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <Users className="w-8 h-8 text-primary" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Telegram</h3>
-                            <p className="text-muted-foreground">@unilib_support</p>
+                            <p className="text-muted-foreground">@umft_official</p>
                         </div>
-                        <div className="p-8 rounded-3xl bg-muted/20 border border-transparent hover:border-primary/50 text-center hover:shadow-xl transition-all group">
+                        <div className="p-8 rounded-3xl bg-background/40 backdrop-blur-sm border border-border/30 hover:border-primary/50 text-center hover:shadow-xl transition-all group">
                             <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <Globe className="w-8 h-8 text-primary" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">Manzil</h3>
-                            <p className="text-muted-foreground">Toshkent, O'zbekiston</p>
+                            <p className="text-muted-foreground">Toshkent, Yakkasaroy tumani, Toʻqimachi MFY</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="py-24 md:py-32 relative overflow-hidden">
-                <div className="absolute inset-0 bg-primary/5" />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light" />
-
-                <div className="container px-4 mx-auto relative z-10 text-center max-w-4xl">
+            <section className="py-24 md:py-32 overflow-hidden">
+                <div className="container px-4 mx-auto text-center max-w-4xl">
                     <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">
                         O'qish jarayonini <br />
                         <span className="text-primary">O'zgartirishga Tayyormisiz?</span>
@@ -189,7 +192,7 @@ export default async function LandingPage() {
                             href="/register"
                             className="px-10 py-5 rounded-2xl bg-card border border-border hover:border-primary/50 text-foreground font-bold text-xl hover:bg-muted/50 transition-all"
                         >
-                            Ro'yxatdan O'tish
+                            Ro'yxatdan o'tish
                         </Link>
                     </div>
                 </div>

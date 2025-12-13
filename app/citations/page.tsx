@@ -58,7 +58,7 @@ export default function CitationsPage() {
                             </div>
                             <h3 className="font-bold mb-1 md:mb-2 text-sm md:text-base">Kutubxonadan</h3>
                             <p className="text-xs md:text-sm text-muted-foreground">
-                                O'qigan kitoblaringizdan
+                                o'qigan kitoblaringizdan
                             </p>
                         </div>
                     </div>

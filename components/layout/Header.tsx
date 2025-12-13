@@ -85,18 +85,18 @@ export function Header() {
     }
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 shadow-sm transition-all duration-300">
+        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm transition-all duration-300">
             <div className={`container flex h-16 items-center px-4 md:px-6 ${isLandingPage ? 'justify-between' : 'justify-end'}`}>
                 {/* Logo - Only on landing page */}
                 {isLandingPage && (
-                    <Link href="/" className="flex items-center gap-2 group">
+                    <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight group">
                         <div className="relative">
-                            <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/30 transition-all rounded-full"></div>
-                            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 shadow-sm group-hover:shadow-primary/25">
-                                <BookOpen className="w-6 h-6" />
+                            <div className="absolute inset-0 bg-primary/20 blur-lg group-hover:bg-primary/30 transition-all rounded-full" />
+                            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-primary/25">
+                                <BookOpen className="w-5 h-5" />
                             </div>
                         </div>
-                        <span className="font-bold text-xl tracking-tight group-hover:text-primary transition-colors">Library ID</span>
+                        <span className="hidden sm:inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent font-black">Library ID</span>
                     </Link>
                 )}
 

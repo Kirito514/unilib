@@ -125,7 +125,7 @@ export function BooksTable({ books: initialBooks, page, totalPages, totalBooks }
                                                 onClick={() => handleDelete(book.id)}
                                                 disabled={isLoading === book.id}
                                                 className="p-2 hover:bg-red-500/10 text-red-500 rounded-lg transition-colors"
-                                                title="O'chirish"
+                                                title="o'chirish"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -183,7 +183,7 @@ export function BooksTable({ books: initialBooks, page, totalPages, totalBooks }
                                     className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors font-medium text-sm disabled:opacity-50"
                                 >
                                     <Trash2 className="w-4 h-4" />
-                                    O'chirish
+                                    o'chirish
                                 </button>
                             </div>
                         </div>

@@ -11,7 +11,7 @@
 
 ## 🌟 Asosiy Funksiyalar
 
-### 📖 Kitob O'qish
+### 📖 Kitob o'qish
 - **PDF Reader** - To'liq funksional PDF o'qish interfeysi
 - **Progress Tracking** - Avtomatik o'qish jarayonini kuzatish
 - **Auto-Resume** - Oxirgi o'qilgan sahifadan davom ettirish
@@ -24,7 +24,7 @@
 - **Reyting (Leaderboard)** - XP va Streak bo'yicha musobaqa
 
 ### 📊 Shaxsiy Dashboard
-- **O'qish Statistikasi** - Kunlik, haftalik, oylik hisobotlar
+- **o'qish Statistikasi** - Kunlik, haftalik, oylik hisobotlar
 - **Bugungi Reja** - Joriy kitob va maqsad
 - **Faoliyat Tarixi** - So'nggi harakatlar
 - **XP Progress Bar** - Keyingi darajagacha qolgan XP
@@ -38,7 +38,7 @@
 - **XP Reytingi** - Eng ko'p XP to'plaganlar
 - **Streak Reytingi** - Eng uzun streak
 - **Top 3 Medals** - Oltin, Kumush, Bronza
-- **User Highlight** - O'z o'rningizni ko'rish
+- **User Highlight** - o'z o'rningizni ko'rish
 
 ---
 
@@ -79,7 +79,7 @@ unilib2/
 │   ├── library/                  # Kutubxona
 │   ├── notifications/            # Bildirishnomalar
 │   ├── reader/[id]/              # Kitob o'qish
-│   └── schedule/                 # O'qish rejasi
+│   └── schedule/                 # o'qish rejasi
 ├── components/                   # React komponentlar
 │   ├── auth/                     # Autentifikatsiya
 │   ├── dashboard/                # Dashboard widgetlar
@@ -121,7 +121,7 @@ unilib2/
 - 📖 Sahifa yutuqlari (100, 500, 1000, 5000 sahifa)
 - 🎯 Maqsad yutuqlari (10, 50, 100 maqsad)
 
-### 2. O'qish Rejasi (Reading Schedule)
+### 2. o'qish Rejasi (Reading Schedule)
 
 **Funksiyalar:**
 - Kitob tanlash
@@ -228,7 +228,7 @@ Barcha jadvallar RLS bilan himoyalangan:
 
 ## 🔄 Coming Soon
 
-- 👥 **O'quv Guruhlari** - Real-time chat, guruh maqsadlari
+- 👥 **o'quv Guruhlari** - Real-time chat, guruh maqsadlari
 - 📝 **Iqtibos Generatori** - APA, MLA, Chicago, Harvard
 - 🔍 **AI Qidiruv** - Semantic search
 - 📈 **Tahlil Dashboard** - Batafsil statistika

@@ -257,7 +257,7 @@ export function BookForm({ initialData }: BookFormProps) {
                                     defaultValue={initialData?.title}
                                     required
                                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none transition-all"
-                                    placeholder="Masalan: O'tgan kunlar"
+                                    placeholder="Masalan: o'tgan kunlar"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -302,7 +302,7 @@ export function BookForm({ initialData }: BookFormProps) {
                                     defaultValue={initialData?.language || 'O\'zbek'}
                                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                                 >
-                                    <option value="O'zbek">O'zbek</option>
+                                    <option value="o'zbek">o'zbek</option>
                                     <option value="Ingliz">Ingliz</option>
                                     <option value="Rus">Rus</option>
                                     <option value="Boshqa">Boshqa</option>

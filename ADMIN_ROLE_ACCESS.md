@@ -10,7 +10,7 @@ HEMIS orqali kirgan foydalanuvchilar ham admin role berilsa, admin panelga kira 
 
 **Fayl:** `components/admin/AdminRoute.tsx`
 
-**O'zgarishlar:**
+**o'zgarishlar:**
 - ✅ Permissions system ishlatiladi (`lib/permissions.ts`)
 - ✅ `isAdmin()`, `isLibrarian()`, `canManageBooks()` funksiyalari
 - ✅ Role-based access control

@@ -10,7 +10,7 @@ ALTER TABLE profiles DROP COLUMN IF EXISTS role CASCADE;
 ALTER TABLE profiles DROP COLUMN IF EXISTS is_active CASCADE;
 ALTER TABLE profiles DROP COLUMN IF EXISTS student_id CASCADE;
 ALTER TABLE profiles DROP COLUMN IF EXISTS parent_phone CASCADE;
--- Note: 'bio' might have been there before or added, keeping it safe or removing if it was part of this feature set? 
+-- Note: 'bio'might have been there before or added, keeping it safe or removing if it was part of this feature set? 
 -- The user mentioned "hamma narsani", but bio is generic. I'll leave bio for now unless requested.
 
 -- 3. Remove columns from books

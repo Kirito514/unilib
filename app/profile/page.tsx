@@ -267,7 +267,7 @@ export default function ProfilePage() {
                                             value={editedProfile.bio}
                                             onChange={(e) => setEditedProfile({ ...editedProfile, bio: e.target.value })}
                                             rows={3}
-                                            placeholder="O'zingiz haqingizda qisqacha yozing..."
+                                            placeholder="o'zingiz haqingizda qisqacha yozing..."
                                             className="w-full px-4 py-3 text-base bg-background/50 backdrop-blur-sm border border-border/60 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none resize-none"
                                         />
                                     ) : (
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                                                                 </div>
                                                                 {isOverdue ? (
                                                                     <span className="px-2 py-0.5 bg-red-500/10 text-red-600 text-xs rounded-full font-medium">
-                                                                        MUDDATI O'TGAN ({Math.abs(daysRemaining)} kun)
+                                                                        MUDDATI o'TGAN ({Math.abs(daysRemaining)} kun)
                                                                     </span>
                                                                 ) : daysRemaining <= 3 ? (
                                                                     <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-600 text-xs rounded-full font-medium">

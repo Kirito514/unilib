@@ -1,10 +1,10 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { Role, hasPermission, ROLES } from '@/lib/permissions';
+import { Role, hasPermission as checkPermission, ROLES } from '@/lib/permissions';
 
 interface User {
     id: string;
@@ -31,14 +31,96 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoggingIn, setIsLoggingIn] = useState(false);
     const router = useRouter();
 
-    // Check for existing session on mount
+    // Memoize setUserFromSupabase to prevent recreation on every render
+    const setUserFromSupabase = useCallback(async (supabaseUser: SupabaseUser, skipCache = false) => {
+        try {
+            // Try to load from cache first for instant load
+            if (!skipCache && typeof window !== 'undefined') {
+                const cached = sessionStorage.getItem('user_profile');
+                if (cached) {
+                    const cachedUser = JSON.parse(cached);
+                    if (cachedUser.id === supabaseUser.id) {
+                        setUser(cachedUser);
+                        // Refresh in background
+                        setTimeout(() => setUserFromSupabase(supabaseUser, true), 100);
+                        return;
+                    }
+                }
+            }
+
+            // Get user profile from profiles table - SELECT ONLY NEEDED FIELDS
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('name, university, role, avatar_url')
+                .eq('id', supabaseUser.id)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Profile fetch error:', error);
+            }
+
+            const userData = {
+                id: supabaseUser.id,
+                email: supabaseUser.email || '',
+                name: profile?.name || supabaseUser.user_metadata?.name || 'User',
+                university: profile?.university,
+                role: (profile?.role as Role) || 'student',
+                avatar_url: profile?.avatar_url,
+            };
+
+            setUser(userData);
+
+            // Cache for instant subsequent loads
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('user_profile', JSON.stringify(userData));
+            }
+        } catch (error) {
+            console.error('Error setting user:', error);
+            const fallbackUser = {
+                id: supabaseUser.id,
+                email: supabaseUser.email || '',
+                name: supabaseUser.user_metadata?.name || 'User',
+                university: undefined,
+                role: 'student' as Role,
+                avatar_url: undefined,
+            };
+            setUser(fallbackUser);
+        }
+    }, []);
+
+    // Memoize checkUser function
+    const checkUser = useCallback(async () => {
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            if (error) {
+                console.debug('Session expired or invalid, clearing:', error.message);
+                await supabase.auth.signOut();
+                setUser(null);
+                setIsLoading(false);
+                return;
+            }
+
+            if (session?.user) {
+                setIsLoading(false);
+                await setUserFromSupabase(session.user);
+            } else {
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error('Error checking user:', error);
+            await supabase.auth.signOut();
+            setUser(null);
+            setIsLoading(false);
+        }
+    }, [setUserFromSupabase]);
+
+    // Auth state change listener
     useEffect(() => {
         checkUser();
 
-        // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_OUT') {
                 setUser(null);
@@ -62,241 +144,116 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         return () => subscription.unsubscribe();
-    }, [router]);
+    }, [checkUser, setUserFromSupabase, router]);
 
-    const checkUser = async () => {
+    // Memoize login function
+    const login = useCallback(async (email: string, password: string) => {
         try {
-            const { data: { session }, error } = await supabase.auth.getSession();
-
-            // If there's an error (like invalid refresh token), clear the session
-            if (error) {
-                // This is expected when session expires - don't spam console
-                console.debug('Session expired or invalid, clearing:', error.message);
-                await supabase.auth.signOut();
-                setUser(null);
-                setIsLoading(false);
-                return;
-            }
-
-            if (session?.user) {
-                // Set loading false immediately to show UI faster
-                setIsLoading(false);
-                await setUserFromSupabase(session.user);
-            } else {
-                setIsLoading(false);
-            }
-        } catch (error) {
-            console.error('Error checking user:', error);
-            // Clear any invalid session
-            await supabase.auth.signOut();
-            setUser(null);
-            setIsLoading(false);
-        }
-    };
-
-    const setUserFromSupabase = async (supabaseUser: SupabaseUser) => {
-        try {
-            // Get user profile from profiles table
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('name, university, role, avatar_url')
-                .eq('id', supabaseUser.id)
-                .maybeSingle(); // Use maybeSingle to avoid errors
-
-            if (error) {
-                console.error('Profile fetch error:', error);
-            }
-
-            setUser({
-                id: supabaseUser.id,
-                email: supabaseUser.email || '',
-                name: profile?.name || supabaseUser.user_metadata?.name || 'User',
-                university: profile?.university,
-                role: (profile?.role as Role) || 'student',
-                avatar_url: profile?.avatar_url,
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
             });
-        } catch (error) {
-            console.error('Error setting user:', error);
-            // Set user with minimal data if profile fetch fails
-            setUser({
-                id: supabaseUser.id,
-                email: supabaseUser.email || '',
-                name: supabaseUser.user_metadata?.name || 'User',
-                university: undefined,
-                role: 'student',
-                avatar_url: undefined,
-            });
-        }
-    };
 
-    const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-        // Prevent concurrent login attempts
-        if (isLoggingIn) {
-            console.log('Login already in progress, ignoring duplicate request');
-            return { success: false, error: 'Login already in progress' };
-        }
-
-        try {
-            setIsLoggingIn(true);
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) {
-                console.error('Login error:', error.message);
-                setIsLoggingIn(false);
                 return { success: false, error: error.message };
             }
+
             if (data.user) {
-                // Set user state immediately
                 await setUserFromSupabase(data.user);
-                setIsLoggingIn(false);
                 return { success: true };
             }
-            setIsLoggingIn(false);
-            return { success: false, error: 'Login failed' };
-        } catch (err: any) {
-            console.error('Login error:', err);
-            setIsLoggingIn(false);
-            return { success: false, error: err.message || 'An unexpected error occurred' };
-        }
-    };
 
-    const register = async (name: string, email: string, password: string, university?: string): Promise<{ success: boolean; error?: string }> => {
+            return { success: false, error: 'Login failed' };
+        } catch (error) {
+            console.error('Login error:', error);
+            return { success: false, error: 'An unexpected error occurred' };
+        }
+    }, [setUserFromSupabase]);
+
+    // Memoize register function
+    const register = useCallback(async (name: string, email: string, password: string, university?: string) => {
         try {
-            // Sign up the user with metadata
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: {
                         name,
-                        university
-                    }
-                }
+                        university,
+                    },
+                },
             });
 
             if (error) {
-                console.error('Registration error:', error.message);
                 return { success: false, error: error.message };
             }
 
             if (data.user) {
-                // Wait a bit for trigger to execute
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                // Check if profile was created by trigger
-                const { data: existingProfile, error: checkError } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('id', data.user.id)
-                    .maybeSingle(); // Use maybeSingle to avoid error if profile doesn't exist
-
-                if (checkError) {
-                    console.error('Error checking profile:', checkError);
-                }
-
-                // If trigger didn't create profile, create it manually
-                if (!existingProfile) {
-                    console.log('Trigger did not create profile, creating manually...');
-
-                    // Create profile manually (without organization_id)
-                    const { error: profileError } = await supabase
-                        .from('profiles')
-                        .insert({
-                            id: data.user.id,
-                            email: data.user.email!,
-                            name: name,
-                            university: university,
-                            role: ROLES.STUDENT,
-                            xp: 0,
-                            level: 1,
-                            streak_days: 0,
-                            total_pages_read: 0,
-                            total_books_completed: 0,
-                            is_active: true
-                        });
-
-                    if (profileError) {
-                        console.error('Profile creation error:', profileError);
-                        return { success: false, error: 'Failed to create user profile. Please try again.' };
-                    }
-                }
-
-                // Set the user state
-                setUser({
-                    id: data.user.id,
-                    email: data.user.email!,
-                    name: name,
-                    university: university,
-                    role: ROLES.STUDENT
-                });
-
                 return { success: true };
             }
 
             return { success: false, error: 'Registration failed' };
-        } catch (error: any) {
+        } catch (error) {
             console.error('Registration error:', error);
-            return { success: false, error: error.message || 'An unexpected error occurred' };
+            return { success: false, error: 'An unexpected error occurred' };
         }
-    };
+    }, []);
 
-    const logout = async () => {
+    // Memoize logout function
+    const logout = useCallback(async () => {
         try {
+            // Clear user state immediately for instant UI update
+            setUser(null);
+
+            // Clear session storage cache
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('user_profile');
+            }
+
             // Sign out from Supabase
             await supabase.auth.signOut();
 
-            // Clear all local storage
-            if (typeof window !== 'undefined') {
-                localStorage.clear();
-                sessionStorage.clear();
-            }
+            // Redirect to login page using Next.js router
+            router.push('/login');
+            router.refresh();
         } catch (error) {
-            console.error('Error signing out:', error);
-        } finally {
+            console.error('Logout error:', error);
+            // Even if error, still clear state and redirect
             setUser(null);
-
-            // Force full page reload to clear all state
-            if (typeof window !== 'undefined') {
-                window.location.href = '/login';
-            } else {
-                router.push('/login');
-                router.refresh();
-            }
+            router.push('/login');
+            router.refresh();
         }
-    };
+    }, [router]);
 
-    const checkPermission = (requiredRole: Role): boolean => {
+    // Memoize permission check functions
+    const hasPermissionCheck = useCallback((permission: Role) => {
         if (!user) return false;
-        return hasPermission(user.role, requiredRole);
-    };
+        return checkPermission(user.role, permission);
+    }, [user]);
 
-    const checkIsAdmin = (): boolean => {
+    const isAdmin = useCallback(() => {
         if (!user) return false;
-        // Include admins, librarians, and head librarians
-        return ([
-            ROLES.SUPER_ADMIN,
-            ROLES.SYSTEM_ADMIN,
-            ROLES.ORG_ADMIN,
-            ROLES.HEAD_LIBRARIAN,
-            ROLES.LIBRARIAN
-        ] as string[]).includes(user.role);
-    };
+        return ['super_admin', 'system_admin', 'org_admin', 'head_librarian', 'librarian'].includes(user.role);
+    }, [user]);
 
-    const checkIsSuperAdmin = (): boolean => {
-        if (!user) return false;
-        return user.role === ROLES.SUPER_ADMIN;
-    };
+    const isSuperAdmin = useCallback(() => {
+        return user?.role === 'super_admin';
+    }, [user]);
+
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
+        user,
+        login,
+        register,
+        logout,
+        isLoading,
+        hasPermission: hasPermissionCheck,
+        isAdmin,
+        isSuperAdmin,
+    }), [user, login, register, logout, isLoading, hasPermissionCheck, isAdmin, isSuperAdmin]);
 
     return (
-        <AuthContext.Provider value={{
-            user,
-            login,
-            register,
-            logout,
-            isLoading,
-            hasPermission: checkPermission,
-            isAdmin: checkIsAdmin,
-            isSuperAdmin: checkIsSuperAdmin
-        }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,11 +1,11 @@
-# TO'LIQ IMPLEMENTATSIYA REJASI
+# To'LIQ IMPLEMENTATSIYA REJASI
 
 ## 🎯 Loyihaning Yangi Ko'rinishi
 
 **Avval:** Online kutubxona platformasi (UniLib)
 **Endi:** **Milliy Raqamli Kutubxona ID Tizimi** 🇺🇿
 
-Bu - O'zbekiston bo'ylab barcha maktab, kollej va universitetlar uchun yagona ID karta tizimi.
+Bu - o'zbekiston bo'ylab barcha maktab, kollej va universitetlar uchun yagona ID karta tizimi.
 
 ---
 
@@ -50,7 +50,7 @@ Bu - O'zbekiston bo'ylab barcha maktab, kollej va universitetlar uchun yagona ID
 │   • Aktiv: 89,234 (71%)                │
 │   • Oylik daromad: $12,450             │
 │                                         │
-│ 📈 O'sish (oyma-oy)                    │
+│ 📈 o'sish (oyma-oy)                    │
 │   • Yangi tashkilotlar: +15            │
 │   • Yangi o'quvchilar: +8,234          │
 │   • Churn rate: 2.1%                   │
@@ -112,7 +112,7 @@ permissions = ['view_all', 'debug', 'support']
 │ 🏫 50-maktab Admin Panel               │
 ├─────────────────────────────────────────┤
 │ 📊 Umumiy Ko'rsatkichlar               │
-│   • O'quvchilar: 650                   │
+│   • o'quvchilar: 650                   │
 │   • Aktiv: 487 (75%)                   │
 │   • Kitoblar: 1,250                    │
 │   • Aktiv qarzlar: 145                 │
@@ -207,7 +207,7 @@ permissions = ['view_all', 'debug', 'support']
 └─────────────────────────────────────────┘
 ```
 
-**O'quvchi skanerlangandan keyin:**
+**o'quvchi skanerlangandan keyin:**
 ```
 ┌─────────────────────────────────────────┐
 │ 👤 Alisher Karimov | 8-A sinf         │
@@ -215,7 +215,7 @@ permissions = ['view_all', 'debug', 'support']
 ├─────────────────────────────────────────┤
 │ 📚 Hozirgi kitoblar: 1/2               │
 │                                         │
-│ ✅ "O'tkan Kunlar" (Abdulla Qodiriy)   │
+│ ✅ "o'tkan Kunlar" (Abdulla Qodiriy)   │
 │    Olingan: 15-noyabr                  │
 │    Qaytarish: 29-noyabr (bugun!)      │
 │    [Muddatni Uzaytirish] [Qaytardi]   │
@@ -242,7 +242,7 @@ permissions = ['view_all', 'debug', 'support']
 
 ---
 
-### 6️⃣ Teacher (O'qituvchi)
+### 6️⃣ Teacher (o'qituvchi)
 
 **Kim:** Fanlar o'qituvchisi
 
@@ -252,17 +252,17 @@ permissions = ['view_all', 'debug', 'support']
 │ 👨‍🏫 Malika Karimova - Adabiyot        │
 │ 📚 8-A sinf                            │
 ├─────────────────────────────────────────┤
-│ 📊 Sinf O'qish Statistikasi            │
+│ 📊 Sinf o'qish Statistikasi            │
 │   • Jami o'quvchilar: 32               │
 │   • Faol: 24 (75%)                     │
 │   • Passiv: 8                          │
 │                                         │
-│ 🏆 Top 5 O'quvchilar                   │
+│ 🏆 Top 5 o'quvchilar                   │
 │   1. Alisher - 12 kitob (Level 6)     │
 │   2. Madina - 10 kitob (Level 5)      │
 │   3. Sardor - 8 kitob (Level 4)       │
 │                                         │
-│ ⚠️ Passive O'quvchilar (0 kitob)       │
+│ ⚠️ Passive o'quvchilar (0 kitob)       │
 │   • Jasur, Dilnoza, Feruza            │
 │                                         │
 │ 📖 Reading Assignments                 │
@@ -283,7 +283,7 @@ permissions = ['view_all', 'debug', 'support']
 - ✅ Passive o'quvchilarni aniqlash
 - ✅ Kitob tavsiya qilish
 - ✅ Haftalik/oylik hisobot (PDF export)
-- ✅ O'quvchilar o'qish kategoriyalari
+- ✅ o'quvchilar o'qish kategoriyalari
 
 **Reading Assignment Misol:**
 ```
@@ -300,7 +300,7 @@ Bajarilish: 18/32
 
 ### 7️⃣ Parent (Ota-ona)
 
-**Kim:** O'quvchining ota-onasi
+**Kim:** o'quvchining ota-onasi
 
 **Dashboardi:**
 ```
@@ -309,7 +309,7 @@ Bajarilish: 18/32
 │ 🎓 8-A sinf | 50-maktab                │
 ├─────────────────────────────────────────┤
 │ 📊 Noyabr Hisoboti                     │
-│   • O'qilgan kitoblar: 5 ta            │
+│   • o'qilgan kitoblar: 5 ta            │
 │   • XP: +350 (Level 5 → Level 6)       │
 │   • Rank: #12 / 650 (Top 2%)           │
 │   • Streak: 🔥 12 kun                  │
@@ -324,7 +324,7 @@ Bajarilish: 18/32
 │                                         │
 │ 💡 Sevimli Kategoriya                  │
 │   • Science Fiction (40%)              │
-│   • O'zbek Adabiyoti (30%)             │
+│   • o'zbek Adabiyoti (30%)             │
 │                                         │
 │ 🎁 Tavsiya                             │
 │   Farzandingiz science fiction sevadi. │
@@ -337,7 +337,7 @@ Bajarilish: 18/32
 - ✅ Farzand profilini ko'rish
 - ✅ Hozirgi va o'tgan kitoblar
 - ✅ XP va ranking
-- ✅ O'qish statistikasi
+- ✅ o'qish statistikasi
 - ✅ Sevimli kategoriyalar
 - ✅ Oylik hisobot email orqali
 - ✅ Kitob rezerv qilish (farzand uchun)
@@ -356,7 +356,7 @@ maktabda Top 2% ichida.
 
 Sevimli kategoriyasi: Science Fiction
 
-📚 O'qilgan kitoblar:
+📚 o'qilgan kitoblar:
 1. Ikki Eshik Orasi - Oybek
 2. Mehrobdan Chayon - Abdulla Qodiriy
 3. Atomic Habits - James Clear
@@ -369,7 +369,7 @@ Sevimli kategoriyasi: Science Fiction
 
 ---
 
-### 8️⃣ Student/User (O'quvchi)
+### 8️⃣ Student/User (o'quvchi)
 
 **Kim:** Maktab, kollej, universitet o'quvchisi
 
@@ -383,7 +383,7 @@ Sevimli kategoriyasi: Science Fiction
 ├─────────────────────────────────────────┤
 │ 📚 Hozirgi Kitoblarim (1)              │
 │                                         │
-│ ✅ "O'tkan Kunlar"                     │
+│ ✅ "o'tkan Kunlar"                     │
 │    📅 Bugun qaytarish kerak!           │
 │    [Muddatni Uzaytir] [Qaytardim]     │
 │                                         │
@@ -411,7 +411,7 @@ Sevimli kategoriyasi: Science Fiction
 ```
 
 **Funksiyalar:**
-- ✅ O'z profilini ko'rish
+- ✅ o'z profilini ko'rish
 - ✅ Hozirgi va o'tgan kitoblar tarixini ko'rish
 - ✅ XP, level, achievements
 - ✅ Leaderboard (maktab/shahar/milliy)
@@ -465,7 +465,7 @@ Orqa tomon:
 #### ID Format:
 `UZ-{REGION}-{YEAR}-{UNIQUE}`
 
-- `UZ` - O'zbekiston
+- `UZ` - o'zbekiston
 - `00045` - Toshkent viloyat kodi (5 raqam)
 - `2024` - Yil
 - `0012345` - Unikal ID (7 raqam)
@@ -477,7 +477,7 @@ Misol: `UZ-00045-2024-0012345`
 ### 2. Book Borrowing Workflow
 
 ```
-1. O'quvchi kartani ko'rsatadi
+1. o'quvchi kartani ko'rsatadi
    ↓
 2. Kutubxonachi skaner qiladi (5 soniya)
    ↓
@@ -506,7 +506,7 @@ Misol: `UZ-00045-2024-0012345`
 **Vaziyat:** Barcha nusxalar band
 
 ```
-O'quvchi: "Men 'Atomic Habits' kitobi kerak"
+o'quvchi: "Men 'Atomic Habits' kitobi kerak"
 Kutubxonachi: "Kechirasiz, barcha 5 nusxa berilgan"
 
 Tizimda:
@@ -580,11 +580,11 @@ Har kuni soat 00:00:
 
 | Turi | Qachon | Kimga | Kanal |
 |------|--------|-------|-------|
-| Eslatma | 3 kun qolgan | O'quvchi | SMS + In-app |
-| Muddati o'tgan | Har kuni | O'quvchi | SMS + Email |
+| Eslatma | 3 kun qolgan | o'quvchi | SMS + In-app |
+| Muddati o'tgan | Har kuni | o'quvchi | SMS + Email |
 | Ota-ona ogohlantiruvi | 7+ kun | Ota-ona | SMS |
-| Rezerv tayyor | Kitob qaytganda | O'quvchi | SMS + Push |
-| Achievement | Yangi badge | O'quvchi | Push + In-app |
+| Rezerv tayyor | Kitob qaytganda | o'quvchi | SMS + Push |
+| Achievement | Yangi badge | o'quvchi | Push + In-app |
 | Haftalik hisobot | Har dushanba | Admin | Email |
 | Oylik hisobot | Har oy 1-si | Ota-ona | Email |
 
@@ -628,7 +628,7 @@ Kutubxonachi kompyuteri:
 │ │ Next.js App        │ │
 │ │                    │ │
 │ │ IndexedDB (Local)  │ │
-│ │ • O'quvchilar      │ │
+│ │ • o'quvchilar      │ │
 │ │ • Kitoblar         │ │
 │ │ • Sync Queue       │ │
 │ └────────────────────┘ │
@@ -667,12 +667,12 @@ Kutubxonachi kompyuteri:
 #### Oylik Hisobot (Har oy 1-si)
 - ✅ Ota-onaga email
 - ✅ Farzand faolligi
-- ✅ O'qilgan kitoblar
+- ✅ o'qilgan kitoblar
 - ✅ Tavsiyalar
 
 ---
 
-## 💾 TO'LIQ DATABASE SCHEMA
+## 💾 To'LIQ DATABASE SCHEMA
 
 ```sql
 -- Organizations

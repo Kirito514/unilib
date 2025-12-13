@@ -1,6 +1,6 @@
 /**
  * Format name from UPPERCASE to Title Case
- * Example: "FAYZULLAYEV ORZUBEK KAMALIDDIN O'G'LI" → "Fayzullayev Orzubek Kamaliddin O'g'li"
+ * Example: "FAYZULLAYEV ORZUBEK KAMALIDDIN o'G'LI" → "Fayzullayev Orzubek Kamaliddin o'g'li"
  */
 export function formatName(name: string): string {
     if (!name) return '';

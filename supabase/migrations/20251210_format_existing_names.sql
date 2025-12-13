@@ -1,5 +1,5 @@
 -- Update existing profiles with formatted names (Title Case)
--- Convert "FAYZULLAYEV ORZUBEK KAMALIDDIN O'G'LI" to "Fayzullayev Orzubek Kamaliddin O'g'li"
+-- Convert "FAYZULLAYEV ORZUBEK KAMALIDDIN o'G'LI" to "Fayzullayev Orzubek Kamaliddin o'g'li"
 
 UPDATE profiles
 SET name = INITCAP(LOWER(name))

@@ -168,7 +168,7 @@ export default function SettingsPage() {
                                 className="flex items-center gap-2 px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-medium rounded-xl transition-all duration-200"
                             >
                                 <Trash2 className="w-5 h-5" />
-                                Akkauntni O'chirish
+                                Akkauntni o'chirish
                             </button>
                         ) : (
                             <div className="space-y-4">
@@ -177,13 +177,13 @@ export default function SettingsPage() {
                                         <strong>Diqqat!</strong> Bu amalni tasdiqlash uchun quyidagi matnni kiriting:
                                     </p>
                                     <p className="text-sm font-mono font-bold text-red-600 dark:text-red-400 mb-3">
-                                        O'CHIRISH
+                                        o'CHIRISH
                                     </p>
                                     <input
                                         type="text"
                                         value={deleteConfirmText}
                                         onChange={(e) => setDeleteConfirmText(e.target.value)}
-                                        placeholder="O'CHIRISH deb yozing"
+                                        placeholder="o'CHIRISH deb yozing"
                                         className="w-full px-4 py-3 bg-background border border-red-500/30 rounded-xl focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all outline-none"
                                     />
                                 </div>

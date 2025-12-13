@@ -1,4 +1,4 @@
-# 📖 UniLib - O'rnatish va Foydalanish Qo'llanmasi
+# 📖 UniLib - o'rnatish va Foydalanish Qo'llanmasi
 
 Bu qo'llanma UniLib loyihasini o'rnatish va ishga tushirish bo'yicha batafsil ko'rsatmalarni o'z ichiga oladi.
 
@@ -7,7 +7,7 @@ Bu qo'llanma UniLib loyihasini o'rnatish va ishga tushirish bo'yicha batafsil ko
 ## 📋 Mundarija
 
 1. [Tizim Talablari](#tizim-talablari)
-2. [O'rnatish](#ornatish)
+2. [o'rnatish](#ornatish)
 3. [Supabase Konfiguratsiyasi](#supabase-konfiguratsiyasi)
 4. [Database Migratsiyalari](#database-migratsiyalari)
 5. [Loyihani Ishga Tushirish](#loyihani-ishga-tushirish)
@@ -31,7 +31,7 @@ Bu qo'llanma UniLib loyihasini o'rnatish va ishga tushirish bo'yicha batafsil ko
 
 ---
 
-## 🚀 O'rnatish
+## 🚀 o'rnatish
 
 ### 1. Repositoriyani Klonlash
 
@@ -40,7 +40,7 @@ git clone https://github.com/Kirito514/unilib.git
 cd unilib
 ```
 
-### 2. Dependencies O'rnatish
+### 2. Dependencies o'rnatish
 
 ```bash
 npm install
@@ -211,9 +211,9 @@ npm run lint
 
 ## 📚 Funksiyalar Bo'yicha Qo'llanma
 
-### 1. Ro'yxatdan O'tish va Kirish
+### 1. Ro'yxatdan o'tish va Kirish
 
-#### Ro'yxatdan O'tish
+#### Ro'yxatdan o'tish
 1. `/` sahifasiga o'ting
 2. "Ro'yxatdan o'tish" tugmasini bosing
 3. Ism, Email, Parol kiriting
@@ -235,7 +235,7 @@ npm run lint
    - Muqova rasmi (ixtiyoriy)
 4. "Saqlash" tugmasini bosing
 
-### 3. O'qish Rejasi Yaratish
+### 3. o'qish Rejasi Yaratish
 
 1. Dashboard ga o'ting
 2. Kitobni tanlang
@@ -246,10 +246,10 @@ npm run lint
    - Kunlik maqsad (sahifa yoki daqiqa)
 5. "Yaratish" tugmasini bosing
 
-### 4. Kitob O'qish
+### 4. Kitob o'qish
 
 1. Dashboard yoki Library dan kitobni tanlang
-2. "O'qishni boshlash" tugmasini bosing
+2. "o'qishni boshlash" tugmasini bosing
 3. PDF reader ochiladi
 4. Sahifalarni o'qing
 5. Progress avtomatik saqlanadi
@@ -280,7 +280,7 @@ npm run lint
 2. Tablarni tanlang:
    - **XP Reytingi** - Eng ko'p XP
    - **Streak Reytingi** - Eng uzun streak
-3. O'z o'rningizni ko'ring (highlight qilingan)
+3. o'z o'rningizni ko'ring (highlight qilingan)
 
 ### 7. Bildirishnomalar
 
@@ -439,7 +439,7 @@ Muammo yuzaga kelsa:
 
 ## ✅ Checklist
 
-O'rnatish to'g'ri bajarilganini tekshirish:
+o'rnatish to'g'ri bajarilganini tekshirish:
 
 - [ ] Node.js o'rnatilgan
 - [ ] Repository klonlangan

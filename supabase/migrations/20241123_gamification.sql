@@ -66,8 +66,8 @@ INSERT INTO achievements (key, title, description, icon, xp_reward, tier, requir
 INSERT INTO achievements (key, title, description, icon, xp_reward, tier, requirement_type, requirement_value) VALUES
 ('century_reader', 'Yuz Sahifa', '100 sahifa o''qidingiz!', '📄', 50, 'bronze', 'pages_read', 100),
 ('thousand_pages', 'Ming Sahifa', '1000 sahifa o''qidingiz!', '📄', 200, 'silver', 'pages_read', 1000),
-('epic_reader', 'Epik O''quvchi', '5000 sahifa o''qidingiz!', '📄', 500, 'gold', 'pages_read', 5000),
-('mega_reader', 'Mega O''quvchi', '10000 sahifa o''qidingiz!', '📄', 1000, 'platinum', 'pages_read', 10000);
+('epic_reader', 'Epik o''quvchi', '5000 sahifa o''qidingiz!', '📄', 500, 'gold', 'pages_read', 5000),
+('mega_reader', 'Mega o''quvchi', '10000 sahifa o''qidingiz!', '📄', 1000, 'platinum', 'pages_read', 10000);
 
 -- Daily Goal Achievements
 INSERT INTO achievements (key, title, description, icon, xp_reward, tier, requirement_type, requirement_value) VALUES

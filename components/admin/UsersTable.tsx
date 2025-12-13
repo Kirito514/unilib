@@ -196,7 +196,7 @@ export function UsersTable({ users: initialUsers, page, totalPages, totalUsers }
                                                 onClick={() => handleDelete(user.id)}
                                                 disabled={isLoading === user.id}
                                                 className="p-1.5 hover:bg-red-500/10 rounded-lg transition-colors text-muted-foreground hover:text-red-500"
-                                                title="O'chirish"
+                                                title="o'chirish"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -280,7 +280,7 @@ export function UsersTable({ users: initialUsers, page, totalPages, totalUsers }
                                     className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors font-medium text-sm disabled:opacity-50"
                                 >
                                     <Trash2 className="w-4 h-4" />
-                                    O'chirish
+                                    o'chirish
                                 </button>
                             </div>
                         </div>

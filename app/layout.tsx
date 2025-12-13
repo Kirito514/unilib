@@ -10,9 +10,9 @@ import { FooterWrapper } from "@/components/layout/FooterWrapper";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Toaster } from "sonner";
 
+import QueryProvider from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { QueryProvider } from "@/components/providers/QueryProvider";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-heading" });

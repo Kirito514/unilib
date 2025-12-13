@@ -31,7 +31,7 @@ export function FeaturedBooks({ books }: FeaturedBooksProps) {
     ];
 
     return (
-        <section className="py-24 md:py-32 bg-muted/20 overflow-hidden">
+        <section className="py-24 md:py-32 overflow-hidden">
             <div className="container px-4 md:px-6 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
                     <div>
@@ -39,7 +39,7 @@ export function FeaturedBooks({ books }: FeaturedBooksProps) {
                             <Star className="w-4 h-4 fill-current" />
                             Tavsiya Etamiz
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-bold">Eng Ko'p O'qilganlar</h2>
+                        <h2 className="text-3xl md:text-5xl font-bold">Eng Ko'p o'qilganlar</h2>
                     </div>
                     <Link href="/library" className="px-6 py-3 rounded-xl border border-border hover:border-primary hover:text-primary transition-colors font-medium flex items-center gap-2 group bg-background">
                         Barcha kitoblar <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

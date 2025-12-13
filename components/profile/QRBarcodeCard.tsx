@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
-import Barcode from 'react-barcode';
+import { LazyQRCode, LazyBarcode } from '@/components/lazy/LazyComponents';
 
 interface QRBarcodeCardProps {
     studentNumber: string;
@@ -25,10 +24,10 @@ export default function QRBarcodeCard({ studentNumber, studentName }: QRBarcodeC
             </h3>
 
             <div className="space-y-6">
-                {/* QR Code */}
+                {/* QR Code - Lazy Loaded */}
                 <div className="flex flex-col items-center">
                     <div className="bg-white p-4 rounded-xl">
-                        <QRCodeSVG
+                        <LazyQRCode
                             value={studentNumber}
                             size={200}
                             level="H"
@@ -40,10 +39,10 @@ export default function QRBarcodeCard({ studentNumber, studentName }: QRBarcodeC
                     </p>
                 </div>
 
-                {/* Barcode */}
+                {/* Barcode - Lazy Loaded */}
                 <div className="flex flex-col items-center">
                     <div className="bg-white p-4 rounded-xl">
-                        <Barcode
+                        <LazyBarcode
                             value={studentNumber}
                             width={2}
                             height={80}

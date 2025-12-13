@@ -235,7 +235,7 @@ export function DashboardClient({
                                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-medium"
                                     >
                                         <BookOpen className="w-4 h-4" />
-                                        O'qishni boshlash
+                                        o'qishni boshlash
                                     </Link>
                                 )}
                             </div>
@@ -247,7 +247,7 @@ export function DashboardClient({
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <BookOpen className="w-5 h-5 text-primary" />
-                                O'qishni davom ettiring
+                                o'qishni davom ettiring
                             </h2>
                             <Link href="/library" className="text-sm text-primary hover:underline flex items-center gap-1">
                                 Barchasi
@@ -307,7 +307,7 @@ export function DashboardClient({
                                 <Target className="w-6 h-6 text-primary" />
                             </div>
                             <h3 className="font-bold mb-1">Guruhlar</h3>
-                            <p className="text-sm text-muted-foreground">O'quv guruhlariga qo'shiling</p>
+                            <p className="text-sm text-muted-foreground">o'quv guruhlariga qo'shiling</p>
                         </Link>
 
                         <Link href="/leaderboard" className="bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 rounded-2xl p-6 hover:shadow-lg hover:shadow-accent/10 transition-all group">
@@ -315,7 +315,7 @@ export function DashboardClient({
                                 <TrendingUp className="w-6 h-6 text-accent" />
                             </div>
                             <h3 className="font-bold mb-1">Reyting</h3>
-                            <p className="text-sm text-muted-foreground">O'z o'rningizni ko'ring</p>
+                            <p className="text-sm text-muted-foreground">o'z o'rningizni ko'ring</p>
                         </Link>
                     </div>
                 </div>

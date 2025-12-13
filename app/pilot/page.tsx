@@ -42,7 +42,7 @@ export default async function PilotPage() {
             {[
               { label: "Mavjud Kitoblar", value: "10k+", icon: Library },
               { label: "Faol Talabalar", value: "5k+", icon: Users },
-              { label: "O'quv Guruhlari", value: "150+", icon: Users },
+              { label: "o'quv Guruhlari", value: "150+", icon: Users },
               { label: "Iqtiboslar", value: "1M+", icon: Quote }
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center justify-center text-center group p-6 rounded-3xl bg-muted/20 hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/20">
@@ -101,7 +101,7 @@ export default async function PilotPage() {
             <div>
               <h2 className="text-3xl md:text-5xl font-bold mb-8 text-foreground">Loyiha Maqsadi</h2>
               <p className="text-xl text-muted-foreground mb-6 leading-relaxed">
-                Ushbu platforma O'zbekiston ta'lim tizimini raqamlashtirish va talabalar uchun yagona, qulay bilim olish muhitini yaratish maqsadida ishlab chiqilgan.
+                Ushbu platforma o'zbekiston ta'lim tizimini raqamlashtirish va talabalar uchun yagona, qulay bilim olish muhitini yaratish maqsadida ishlab chiqilgan.
               </p>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Bizning asosiy vazifamiz — har bir talabaga sifatli ta'lim resurslaridan foydalanish imkoniyatini berish va akademik halollikni ta'minlashdir.
@@ -156,7 +156,7 @@ export default async function PilotPage() {
                 <Globe className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-xl font-bold mb-3">Manzil</h3>
-              <p className="text-muted-foreground">Toshkent, O'zbekiston</p>
+              <p className="text-muted-foreground">Toshkent, o'zbekiston</p>
             </div>
           </div>
         </div>
@@ -169,8 +169,8 @@ export default async function PilotPage() {
 
         <div className="container px-4 mx-auto relative z-10 text-center max-w-4xl">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">
-            O'qish jarayonini <br />
-            <span className="text-primary">O'zgartirishga Tayyormisiz?</span>
+            o'qish jarayonini <br />
+            <span className="text-primary">o'zgartirishga Tayyormisiz?</span>
           </h2>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
             Akademik maqsadlariga erishish uchun UniLib dan foydalanayotgan minglab talabalarga qo'shiling.
@@ -187,7 +187,7 @@ export default async function PilotPage() {
               href="/register"
               className="px-10 py-5 rounded-2xl bg-card border border-border hover:border-primary/50 text-foreground font-bold text-xl hover:bg-muted/50 transition-all"
             >
-              Ro'yxatdan O'tish
+              Ro'yxatdan o'tish
             </Link>
           </div>
         </div>

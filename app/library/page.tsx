@@ -12,20 +12,20 @@ interface PageProps {
 
 async function getBooks(
     page: number = 1,
-    limit: number = 12,
+    limit: number = 8, // Reduced from 12 to 8 for faster initial load
     search?: string,
     category?: string,
     minRating?: number,
     sortBy: string = 'newest',
-    onlineOnly: boolean = true // ✅ Default to online only
+    onlineOnly: boolean = true
 ) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    // Build query with filters
+    // Build query with ONLY necessary fields for better performance
     let booksQuery = supabaseAdmin
         .from('books')
-        .select('id, title, author, rating, cover_color, category, cover_url, views_count, physical_book_copies(id)');
+        .select('id, title, author, rating, cover_color, category, cover_url', { count: 'exact' });
 
     // Apply search filter
     if (search && search.trim()) {

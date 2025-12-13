@@ -292,7 +292,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     message TEXT NOT NULL,
-    type TEXT DEFAULT 'info' CHECK (type IN ('info', 'success', 'warning', 'achievement')),
+    type TEXT DEFAULT 'info'CHECK (type IN ('info', 'success', 'warning', 'achievement')),
     is_read BOOLEAN DEFAULT false,
     link TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()

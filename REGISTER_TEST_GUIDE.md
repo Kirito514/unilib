@@ -1,6 +1,6 @@
 # ✅ Register Funksiyasi Test Qo'llanmasi
 
-## O'zgarishlar
+## o'zgarishlar
 
 ### AuthContext.tsx da qilingan yaxshilanishlar:
 
@@ -19,14 +19,14 @@ Server allaqachon ishlamoqda:
 http://localhost:3000
 ```
 
-### 2. Register Sahifasiga O'tish
+### 2. Register Sahifasiga o'tish
 
 Brauzerda quyidagi manzilga o'ting:
 ```
 http://localhost:3000/register
 ```
 
-### 3. Ro'yxatdan O'tish
+### 3. Ro'yxatdan o'tish
 
 Formani to'ldiring:
 - **To'liq ism**: Test User

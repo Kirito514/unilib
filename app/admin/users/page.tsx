@@ -8,11 +8,17 @@ async function getUsers(page: number = 1, limit: number = 10) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    // Get paginated data with count and active loans in single query
+    // Optimized: Select only necessary fields (not *)
     const { data: users, error, count } = await supabaseAdmin
         .from('profiles')
         .select(`
-            *,
+            id,
+            email,
+            name,
+            role,
+            university,
+            is_active,
+            created_at,
             book_checkouts!book_checkouts_user_id_fkey(id, status)
         `, { count: 'exact' })
         .order('created_at', { ascending: false })

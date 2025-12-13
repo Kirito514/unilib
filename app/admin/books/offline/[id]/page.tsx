@@ -162,7 +162,7 @@ export default function OfflineBookDetailsPage({ params }: PageProps) {
                         onClick={handleDeleteBook}
                     >
                         <Trash2 className="w-4 h-4" />
-                        O'chirish
+                        o'chirish
                     </button>
                 </div>
             </div>

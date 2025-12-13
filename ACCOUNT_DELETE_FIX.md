@@ -22,25 +22,25 @@ Bu endpoint:
 
 **Fayl:** `app/settings/page.tsx`
 
-O'zgarishlar:
+o'zgarishlar:
 - ✅ API endpoint chaqiradi
 - ✅ Client-side admin call o'chirildi
 - ✅ Sign out va redirect to'g'rilandi
 
 ## 🧪 Test Qilish
 
-### 1. Settings Sahifasiga O'tish
+### 1. Settings Sahifasiga o'tish
 
 ```
 http://localhost:3000/settings
 ```
 
-### 2. Account O'chirish
+### 2. Account o'chirish
 
-1. **"Akkauntni O'chirish"** tugmasini bosing
+1. **"Akkauntni o'chirish"** tugmasini bosing
 2. Tasdiqlash oynasi ochiladi
-3. **"O'CHIRISH"** deb yozing (katta harflar bilan)
-4. **"Akkauntni O'chirish"** tugmasini bosing
+3. **"o'CHIRISH"** deb yozing (katta harflar bilan)
+4. **"Akkauntni o'chirish"** tugmasini bosing
 
 ### 3. Kutilayotgan Natija
 
@@ -96,7 +96,7 @@ API endpoint `SUPABASE_SERVICE_ROLE_KEY` ishlatadi. Bu key:
 ### Tasdiqlash
 
 Foydalanuvchi:
-1. "O'CHIRISH" deb yozishi kerak (katta harflar)
+1. "o'CHIRISH" deb yozishi kerak (katta harflar)
 2. Tugma disabled bo'ladi (agar to'g'ri yozmasa)
 3. Ikki marta tasdiqlash kerak (modal + input)
 

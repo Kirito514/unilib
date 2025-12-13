@@ -60,6 +60,6 @@ export function CitationOutput({ citation, format, onFormatChange }: CitationOut
                     Always double-check citations against your institution's guidelines.
                 </p>
             </div>
-        </div>
+        </div >
     );
 }

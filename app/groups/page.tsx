@@ -16,7 +16,7 @@ export default function GroupsPage() {
 
                     {/* Title */}
                     <h1 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4">
-                        O'quv Guruhlari
+                        o'quv Guruhlari
                     </h1>
 
                     {/* Coming Soon Badge */}
@@ -28,7 +28,7 @@ export default function GroupsPage() {
                     {/* Description */}
                     <p className="text-sm md:text-lg text-muted-foreground mb-8 md:mb-12 max-w-2xl mx-auto">
                         Do'stlaringiz bilan birgalikda o'qing, muhokama qiling va bilimlaringizni oshiring.
-                        O'quv guruhlari funksiyasi ustida ishlanmoqda.
+                        o'quv guruhlari funksiyasi ustida ishlanmoqda.
                     </p>
 
                     {/* Features Preview */}

@@ -37,7 +37,9 @@ export default function GroupDetailPage({ params }: { params: { id: string } }) 
                         <div className="space-y-3">
                             {[
                                 { name: 'Chapter 4 Summary.pdf', type: 'file' },
-                                { name: 'Dynamic Prog. Video', type: 'link' },
+                                {
+                                    name: 'Dynamic Prog. Video', type: 'link'
+                                },
                                 { name: 'Practice Problems.docx', type: 'file' },
                                 { name: 'Graph Theory Notes', type: 'file' }
                             ].map((item, i) => (

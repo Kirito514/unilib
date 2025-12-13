@@ -152,7 +152,7 @@ export function BookDetailClient({ book, similarBooks, initialReviews, userId: i
                                         className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-lg hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/25 hover:-translate-y-1"
                                     >
                                         <BookOpen className="w-5 h-5" />
-                                        O'qishni Boshlash
+                                        o'qishni Boshlash
                                     </button>
                                     <a
                                         href={book.file_url}
@@ -217,7 +217,7 @@ export function BookDetailClient({ book, similarBooks, initialReviews, userId: i
                 {similarBooks.length > 0 && (
                     <div className="border-t border-border/50 pt-16">
                         <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-3xl font-bold">O'xshash Kitoblar</h2>
+                            <h2 className="text-3xl font-bold">o'xshash Kitoblar</h2>
                             <Link href={`/library?category=${book.category}`} className="text-primary font-medium hover:underline">
                                 Barchasini ko'rish
                             </Link>

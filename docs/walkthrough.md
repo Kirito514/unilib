@@ -29,7 +29,7 @@ UniLib platformasining landing page'ini **Milliy Raqamli Kutubxona ID Tizimi** u
 ```
 "Cheksiz Bilimlar Sizning Qo'lingizda"
 - AI Search Bar
-- Katalogga O'tish
+- Katalogga o'tish
 - Guruhlarga Qo'shilish
 ```
 
@@ -57,7 +57,7 @@ UniLib platformasining landing page'ini **Milliy Raqamli Kutubxona ID Tizimi** u
 - ❌ Kitob kimda ekanini topish qiyin
 - ❌ Qog'oz daftar - tartibsizlik
 - ❌ Statistika yo'q
-- ❌ O'quvchilar motivatsiyasi past
+- ❌ o'quvchilar motivatsiyasi past
 
 **Yechim (ID Tizimi):**
 - ✅ Karta skaner qilish - 5 soniya ⚡
@@ -99,7 +99,7 @@ UniLib platformasining landing page'ini **Milliy Raqamli Kutubxona ID Tizimi** u
 
 **3 Qadamli Jarayon:**
 
-1. **Ro'yxatdan O'ting** (30 kun bepul sinov)
+1. **Ro'yxatdan o'ting** (30 kun bepul sinov)
 2. **Sozlang** (Kitoblar va o'quvchilar import)
 3. **Ishlating** (Kartalarni skaner qiling)
 
@@ -114,7 +114,7 @@ UniLib platformasining landing page'ini **Milliy Raqamli Kutubxona ID Tizimi** u
 
 **3 ta Reja:**
 
-| Reja | Narx | O'quvchilar | Kitoblar |
+| Reja | Narx | o'quvchilar | Kitoblar |
 |------|------|-------------|----------|
 | **Maktab** | 40-90k so'm/oy | 200 tagacha | 1,000 tagacha |
 | **Kollej** | 100-150k so'm/oy | 500 tagacha | 3,000 tagacha |
@@ -137,9 +137,9 @@ UniLib platformasining landing page'ini **Milliy Raqamli Kutubxona ID Tizimi** u
 
 **4 ta Ko'rsatkich:**
 - 50+ Muassasalar
-- 25,000+ O'quvchilar
+- 25,000+ o'quvchilar
 - 90% Vaqt Tejash
-- 5 soniya O'rtacha Xizmat
+- 5 soniya o'rtacha Xizmat
 
 ---
 

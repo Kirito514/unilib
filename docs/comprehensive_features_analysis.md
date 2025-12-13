@@ -6,7 +6,7 @@ Sizning yangi talablaringizga ko'ra, UniLib platformasi **Enterprise darajadagi 
 
 ---
 
-## 🎯 Asosiy O'zgarishlar
+## 🎯 Asosiy o'zgarishlar
 
 ### Avvalgi Reja vs Yangi Reja
 
@@ -75,10 +75,10 @@ permissions = ['manage_librarians', 'edit_settings', 'financial_reports']
 
 ### 3️⃣ **Teacher** (Yangi!)
 
-**Kim:** O'qituvchilar
+**Kim:** o'qituvchilar
 
 **Funksiyalari:**
-- O'z sinfi statistikasini ko'rish
+- o'z sinfi statistikasini ko'rish
 - **Reading assignments berish** (yangi funksiya!)
 - Passive o'quvchilarni aniqlash
 - Kitob tavsiya qilish
@@ -110,7 +110,7 @@ CREATE TABLE assignment_completions (
 **Frontend:**
 - `/teacher/dashboard` - Sinf statistikasi
 - `/teacher/assignments` - Reading assignment berish
-- `/teacher/students` - O'quvchilar ro'yxati
+- `/teacher/students` - o'quvchilar ro'yxati
 
 ---
 
@@ -177,7 +177,7 @@ ALTER TABLE profiles ADD COLUMN barcode TEXT;
 
 **Printing Options:**
 1. **Bizdan buyurtma** - Biz chop etib yuboramiz (3-5 kun)
-2. **O'zi chop etish** - PDF yuklab oladi va local printer'da chop etadi
+2. **o'zi chop etish** - PDF yuklab oladi va local printer'da chop etadi
 
 **PDF Template:**
 - Front: QR code, Barcode, Ism, Maktab, Logo

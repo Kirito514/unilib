@@ -87,8 +87,8 @@ export function LibraryFilters() {
                 <button
                     onClick={toggleOnlineOnly}
                     className={`px-5 py-3 rounded-xl font-semibold text-sm transition-all shadow-sm flex items-center gap-2 ${onlineOnly
-                            ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90'
-                            : 'bg-background/50 backdrop-blur-md border border-border hover:border-primary/50'
+                        ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90'
+                        : 'bg-background/50 backdrop-blur-md border border-border hover:border-primary/50'
                         }`}
                 >
                     <Globe className="w-4 h-4" />

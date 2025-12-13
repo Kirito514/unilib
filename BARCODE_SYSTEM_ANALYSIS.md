@@ -84,7 +84,7 @@ UniLib platformasida **2 xil barcode tizimi** ishlatilmoqda:
 - `ZZZ` = Copy number (3 digits, padded)
 
 **Example**: `79123456780001`
-- `79` = From book title "O'tgan kunlar" (O = 79)
+- `79` = From book title "o'tgan kunlar" (O = 79)
 - `12345678` = Hash of book UUID
 - `001` = First copy
 

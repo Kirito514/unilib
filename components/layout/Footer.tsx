@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { BookOpen, Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Send } from 'lucide-react';
+import { BookOpen, Facebook, Instagram, Mail, Phone, MapPin, Send, Youtube } from 'lucide-react';
 
 export function Footer() {
     const [email, setEmail] = useState('');
@@ -33,17 +33,17 @@ export function Footer() {
                             Ta'lim muassasalari uchun yagona raqamli identifikatsiya va kutubxona boshqaruv tizimi.
                         </p>
                         <div className="flex gap-3">
-                            <Link href="#" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
-                                <Facebook className="w-5 h-5" />
-                            </Link>
-                            <Link href="#" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
-                                <Twitter className="w-5 h-5" />
-                            </Link>
-                            <Link href="#" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
+                            <Link href="https://www.instagram.com/umft.uz" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
                                 <Instagram className="w-5 h-5" />
                             </Link>
-                            <Link href="#" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
-                                <Linkedin className="w-5 h-5" />
+                            <Link href="https://t.me/umft_official" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
+                                <Send className="w-5 h-5" />
+                            </Link>
+                            <Link href="https://www.youtube.com/@umftuz" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
+                                <Youtube className="w-5 h-5" />
+                            </Link>
+                            <Link href="http://facebook.com/umft.uz" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md">
+                                <Facebook className="w-5 h-5" />
                             </Link>
                         </div>
                     </div>
@@ -118,19 +118,19 @@ export function Footer() {
                                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                                     <MapPin className="w-4 h-4" />
                                 </div>
-                                <span className="leading-relaxed">Toshkent sh., Yakkasaroy tumani</span>
+                                <span className="leading-relaxed">Toshkent, Yakkasaroy tumani, Toʻqimachi MFY, Bog'ibo'ston ko'chasi, 3-a-uy</span>
                             </li>
                             <li className="flex items-center gap-3 group">
                                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                                     <Phone className="w-4 h-4" />
                                 </div>
-                                <span>(55) 520-88-88</span>
+                                <span>+998 (55) 520-88-88</span>
                             </li>
                             <li className="flex items-center gap-3 group">
                                 <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                                     <Mail className="w-4 h-4" />
                                 </div>
-                                <span>info@unilib.uz</span>
+                                <span>info@umft-official.uz</span>
                             </li>
                         </ul>
 

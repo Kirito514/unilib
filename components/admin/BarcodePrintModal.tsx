@@ -83,39 +83,39 @@ export function BarcodePrintModal({ barcodes, onClose }: BarcodePrintModalProps)
                     align-items: center;
                     justify-content: center;
                     page-break-after: ${index < barcodes.length - 1 ? 'always' : 'auto'};
-                    page-break-inside: avoid;
-                    margin: 0;
-                    padding: 0;
-                ">
-                    <img src="${dataUrl}" style="max-width: 54mm; max-height: 27mm;" />
-                </div>
-            `;
+                    page -break-inside: avoid;
+            margin: 0;
+            padding: 0;
+            ">
+                < img src = "${dataUrl}" style = "max-width: 54mm; max-height: 27mm;" />
+                </div >
+        `;
         }).join('');
 
         printWindow.document.write(`
-            <!DOCTYPE html>
+        < !DOCTYPE html >
             <html>
-            <head>
-                <title>Barcode Print</title>
-                <style>
-                    @page {
-                        size: 57mm 30mm;
+                <head>
+                    <title>Barcode Print</title>
+                    <style>
+                        @page {
+                            size: 57mm 30mm;
                         margin: 0;
                     }
-                    body {
-                        margin: 0;
+                        body {
+                            margin: 0;
                         padding: 0;
                     }
-                    .barcode-page {
-                        background: white;
+                        .barcode-page {
+                            background: white;
                     }
-                </style>
-            </head>
-            <body>
-                ${barcodesHTML}
-            </body>
+                    </style>
+                </head>
+                <body>
+                    ${barcodesHTML}
+                </body>
             </html>
-        `);
+    `);
 
         printWindow.document.close();
 
@@ -169,7 +169,7 @@ export function BarcodePrintModal({ barcodes, onClose }: BarcodePrintModalProps)
 
                 {/* Print-only Barcodes - Each as separate page */}
                 {barcodes.map((barcode, index) => (
-                    <div key={`print-${index}`} className="barcode-print-page">
+                    <div key={`print - ${index} `} className="barcode-print-page">
                         <canvas
                             ref={(el) => { printCanvasRefs.current[index] = el; }}
                             className="barcode-print-canvas"
@@ -197,69 +197,69 @@ export function BarcodePrintModal({ barcodes, onClose }: BarcodePrintModalProps)
 
             {/* Print Styles - Optimized for Xprinter XP-635B (57mm x 30mm) */}
             <style jsx global>{`
-                @media print {
-                    @page {
-                        size: 57mm 30mm;
-                        margin: 0;
-                    }
+    @media print {
+        @page {
+            size: 57mm 30mm;
+            margin: 0;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 57mm;
+            height: 30mm;
+        }
+
+        /* Hide everything except print pages */
+        body * {
+            visibility: hidden;
+        }
+
+            /* Show print pages and their children */
+            .barcode - print - page,
+                    .barcode - print - page * {
+                visibility: visible!important;
+            }
+
+                /* Each barcode fills exactly one page */
+                .barcode - print - page {
+            position: relative;
+            width: 57mm!important;
+            height: 30mm!important;
+            min - height: 30mm!important;
+            max - height: 30mm!important;
+            margin: 0;
+            padding: 0;
+            background: white;
+            display: flex!important;
+            align - items: center;
+            justify - content: center;
+            overflow: hidden;
+            page -break-before: always;
+            page -break-after: always;
+            page -break-inside: avoid;
+        }
                     
-                    html, body {
-                        margin: 0;
-                        padding: 0;
-                        width: 57mm;
-                        height: 30mm;
-                    }
+                    .barcode - print - page: first - child {
+            page -break-before: auto;
+        }
                     
-                    /* Hide everything except print pages */
-                    body * {
-                        visibility: hidden;
-                    }
+                    .barcode - print - page: last - child {
+            page -break-after: auto;
+        }
                     
-                    /* Show print pages and their children */
-                    .barcode-print-page,
-                    .barcode-print-page * {
-                        visibility: visible !important;
-                    }
-                    
-                    /* Each barcode fills exactly one page */
-                    .barcode-print-page {
-                        position: relative;
-                        width: 57mm !important;
-                        height: 30mm !important;
-                        min-height: 30mm !important;
-                        max-height: 30mm !important;
-                        margin: 0;
-                        padding: 0;
-                        background: white;
-                        display: flex !important;
-                        align-items: center;
-                        justify-content: center;
-                        overflow: hidden;
-                        page-break-before: always;
-                        page-break-after: always;
-                        page-break-inside: avoid;
-                    }
-                    
-                    .barcode-print-page:first-child {
-                        page-break-before: auto;
-                    }
-                    
-                    .barcode-print-page:last-child {
-                        page-break-after: auto;
-                    }
-                    
-                    .barcode-print-canvas {
-                        display: block;
-                        max-width: 54mm;
-                        max-height: 27mm;
-                    }
-                    
+                    .barcode - print - canvas {
+            display: block;
+            max - width: 54mm;
+            max - height: 27mm;
+        }
+
                     /* Hide UI elements */
-                    .no-print {
-                        display: none !important;
-                    }
-                }
-            `}</style>
+                    .no - print {
+            display: none!important;
+        }
+    }
+    `}</style>
         </div>
     );
 }

@@ -205,7 +205,7 @@ export default function CreateOfflineBookPage() {
                                     name="title"
                                     required
                                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none transition-all"
-                                    placeholder="Masalan: O'tgan kunlar"
+                                    placeholder="Masalan: o'tgan kunlar"
                                 />
                             </div>
                             <div className="space-y-2">

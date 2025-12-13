@@ -116,7 +116,7 @@ export default function SchedulePage() {
                 {/* Header */}
                 <div className="mb-6 md:mb-8">
                     <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-1 md:mb-2">
-                        📅 O'qish Rejam
+                        📅 o'qish Rejam
                     </h1>
                     <p className="text-sm md:text-base text-muted-foreground">
                         Kitoblaringizni rejalashtiring va maqsadlaringizga erishing

@@ -13,8 +13,8 @@ interface Badge {
 
 export function BadgeDisplay() {
     const badges: Badge[] = [
-        { id: '1', name: 'Bookworm', description: 'Read 10 books', icon: Book, unlocked: true, date: '2 days ago', color: 'text-blue-500 bg-blue-500/10' },
-        { id: '2', name: 'Speed Reader', description: 'Read 100 pages in an hour', icon: Zap, unlocked: true, date: '1 week ago', color: 'text-yellow-500 bg-yellow-500/10' },
+        { id: '1', name: 'Bookworm', description: 'Read 10 books', icon: Book, unlocked: true, date: '2 days ago', color: 'text- blue - 500 bg - blue - 500 / 10' },
+        { id: '2', name: 'Speed Reader', description: 'Read 100 pages in an hour', icon: Zap, unlocked: true, date: '1 week ago', color: 'text- yellow - 500 bg - yellow - 500 / 10' },
         { id: '3', name: 'Consistent', description: '7 day reading streak', icon: Star, unlocked: true, date: 'Yesterday', color: 'text-purple-500 bg-purple-500/10' },
         { id: '4', name: 'Social Butterfly', description: 'Join 5 study groups', icon: Award, unlocked: false, color: 'text-pink-500 bg-pink-500/10' },
         { id: '5', name: 'Deep Diver', description: 'Read for 5 hours straight', icon: Target, unlocked: false, color: 'text-emerald-500 bg-emerald-500/10' },

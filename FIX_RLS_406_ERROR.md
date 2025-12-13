@@ -20,7 +20,7 @@ Bu **Row Level Security (RLS)** muammosi - yangi foydalanuvchi o'z profilini o'q
 5. Barcha kodni nusxalang va SQL Editor ga joylashtiring
 6. **Run** tugmasini bosing
 
-### 2. Kod O'zgarishlari (Allaqachon Qilindi)
+### 2. Kod o'zgarishlari (Allaqachon Qilindi)
 
 AuthContext.tsx da:
 - ✅ `.single()` → `.maybeSingle()` (406 xatosini oldini oladi)

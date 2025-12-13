@@ -179,6 +179,13 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    /* Use standard apostrophe for better compatibility */
+    font-feature-settings: "liga" 0;
+  }
+
+  /* Normalize Uzbek apostrophe display */
+  body * {
+    text-rendering: optimizeLegibility;
   }
 }
 
